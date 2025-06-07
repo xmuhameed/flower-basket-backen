@@ -1,0 +1,343 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+    // output   = "../generated/prisma"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model admin {
+    id     Int    @id @default(autoincrement())
+    qrcode String @unique
+
+    fullname String
+    email    String  @unique
+    phone    String? @unique
+
+    password String
+
+    profile_image_url String?
+    gender            gender?
+    birth_date        DateTime?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+
+    @@index([deleted])
+}
+
+model user {
+    id     Int    @id @default(autoincrement())
+    qrcode String @unique
+
+    fullname String
+    email    String  @unique
+    phone    String? @unique
+
+    password String
+
+    profile_image_url String?
+    gender            gender?
+    birth_date        DateTime?
+
+    country  country?
+    currency currency?
+    language language?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+
+    addresses address[]
+    user_rates user_rate[]
+    favorites favorite[]
+    carts cart[]
+    orders order[]
+}
+
+model address {
+    id Int @id @default(autoincrement())
+
+    user_id Int
+    user    user @relation(fields: [user_id], references: [id])
+
+    location_url    String?
+    recipient_name  String?
+    recipient_phone String?
+
+    address         String
+    country         country
+    address_details String?
+    zip_code        String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+    order   order[]
+
+    @@index([deleted])
+}
+
+model category {
+    id     Int    @id @default(autoincrement())
+    qrcode String @unique
+
+    name String @unique
+
+    sort               Int     @unique @default(0)
+    category_image_url String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean   @default(false)
+    product product[]
+
+    @@index([deleted])
+}
+
+model collection {
+    id     Int    @id @default(autoincrement())
+    qrcode String @unique
+
+    name String @unique
+
+    sort                 Int     @unique @default(0)
+    collection_image_url String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean   @default(false)
+    product product[]
+
+    @@index([deleted])
+}
+
+model home_slider {
+    id     Int    @id @default(autoincrement())
+    qrcode String @unique
+
+    name String @unique
+
+    sort             Int     @unique @default(0)
+    slider_image_url String?
+
+    button_text String?
+    button_url  String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+
+    @@index([deleted])
+}
+
+model brand {
+    id     Int    @id @default(autoincrement())
+    qrcode String @unique
+
+    name String @unique
+
+    brand_image_url String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean   @default(false)
+    product product[]
+
+    @@index([deleted])
+}
+
+model gift_for {
+    id     Int    @id @default(autoincrement())
+    qrcode String @unique
+
+    name String @unique
+
+    sort               Int     @unique @default(0)
+    gift_for_image_url String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean   @default(false)
+    product product[]
+
+    @@index([deleted])
+}
+
+model product {
+    id Int @id @default(autoincrement())
+
+    name     String   @unique
+    price    Int
+    currency currency
+
+    description String?
+    how_to_care String?
+    content     String?
+    alert       String?
+    dimensions  String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+
+    category_id Int?
+    category    category? @relation(fields: [category_id], references: [id])
+
+    collection_id Int?
+    collection    collection? @relation(fields: [collection_id], references: [id])
+
+    gift_for_id Int?
+    gift_for    gift_for? @relation(fields: [gift_for_id], references: [id])
+
+    brand_id Int?
+    brand    brand? @relation(fields: [brand_id], references: [id])
+
+    user_rate     user_rate[]
+    cart          cart[]
+    order         order[]
+    favorite      favorite[]
+    product_image product_image[]
+
+    @@index([deleted])
+}
+
+model product_image {
+    id     Int    @id @default(autoincrement())
+    qrcode String @unique
+
+    product_id Int
+    product    product @relation(fields: [product_id], references: [id])
+
+    image_url String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+
+    @@index([deleted])
+}
+
+model user_rate {
+    id Int @id @default(autoincrement())
+
+    user_id Int
+    user    user @relation(fields: [user_id], references: [id])
+
+    product_id Int
+    product    product @relation(fields: [product_id], references: [id])
+
+    rate      Int
+    rate_text String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+
+    @@index([deleted])
+}
+
+model favorite {
+    id Int @id @default(autoincrement())
+
+    user_id Int
+    user    user @relation(fields: [user_id], references: [id])
+
+    product_id Int
+    product    product @relation(fields: [product_id], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+
+    @@index([deleted])
+}
+
+model cart {
+    id Int @id @default(autoincrement())
+
+    user_id Int
+    user    user @relation(fields: [user_id], references: [id])
+
+    product_id Int
+    product    product @relation(fields: [product_id], references: [id])
+
+    quantity Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+
+    @@index([deleted])
+}
+
+model order {
+    id Int @id @default(autoincrement())
+
+    user_id Int
+    user    user @relation(fields: [user_id], references: [id])
+
+    product_id Int
+    product    product @relation(fields: [product_id], references: [id])
+
+    address_id Int
+    address    address @relation(fields: [address_id], references: [id])
+
+    quantity Int
+
+    status order_status
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+
+    @@index([deleted])
+}
+
+enum gender {
+    male
+    female
+}
+
+enum order_status {
+    pending
+    processing
+    delivered
+    cancelled
+}
+
+enum country {
+    kuwait
+}
+
+enum currency {
+    kwd
+}
+
+enum language {
+    ar
+    en
+}
