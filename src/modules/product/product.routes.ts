@@ -13,34 +13,34 @@ const router = Router();
 router.use(protect);
 
 router
-  .route('/')
-  .post(
-    restrictTo(UserType.ADMIN),
-    validationMiddleware({ body: [CreateProductDto] }),
-    productController.createProduct
-  )
-  .get(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ query: [GetAllProductsDto, GlobalPaginationDto, GlobalSearchDto] }),
-    productController.getAllProducts
-  );
+	.route('/')
+	.post(
+		restrictTo(UserType.ADMIN),
+		validationMiddleware({ body: [CreateProductDto] }),
+		productController.createProduct,
+	)
+	.get(
+		restrictTo(UserType.ADMIN, UserType.USER),
+		validationMiddleware({ query: [GetAllProductsDto, GlobalPaginationDto, GlobalSearchDto] }),
+		productController.getAllProducts,
+	);
 
 router
-  .route('/:id')
-  .get(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ params: [IdentifierDto] }),
-    productController.getProductById
-  )
-  .put(
-    restrictTo(UserType.ADMIN),
-    validationMiddleware({ body: [UpdateProductDto], params: [IdentifierDto] }),
-    productController.updateProduct
-  )
-  .delete(
-    restrictTo(UserType.ADMIN),
-    validationMiddleware({ params: [IdentifierDto] }),
-    productController.deleteProduct
-  );
+	.route('/:id')
+	.get(
+		restrictTo(UserType.ADMIN, UserType.USER),
+		validationMiddleware({ params: [IdentifierDto] }),
+		productController.getProductById,
+	)
+	.put(
+		restrictTo(UserType.ADMIN),
+		validationMiddleware({ body: [UpdateProductDto], params: [IdentifierDto] }),
+		productController.updateProduct,
+	)
+	.delete(
+		restrictTo(UserType.ADMIN),
+		validationMiddleware({ params: [IdentifierDto] }),
+		productController.deleteProduct,
+	);
 
-export default router;
+export const productRoutes = router;

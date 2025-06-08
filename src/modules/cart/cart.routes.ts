@@ -13,34 +13,21 @@ const router = Router();
 router.use(protect);
 
 router
-  .route('/')
-  .post(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ body: [CreateCartDto] }),
-    cartController.createCart
-  )
-  .get(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ query: [GetAllCartsDto, GlobalPaginationDto] }),
-    cartController.getAllCarts
-  );
+	.route('/')
+	.post(restrictTo(UserType.USER), validationMiddleware({ body: [CreateCartDto] }), cartController.createCart)
+	.get(
+		restrictTo(UserType.USER),
+		validationMiddleware({ query: [GetAllCartsDto, GlobalPaginationDto] }),
+		cartController.getAllCarts,
+	);
 
 router
-  .route('/:id')
-  .get(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ params: [IdentifierDto] }),
-    cartController.getCartById
-  )
-  .put(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ body: [UpdateCartDto], params: [IdentifierDto] }),
-    cartController.updateCart
-  )
-  .delete(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ params: [IdentifierDto] }),
-    cartController.deleteCart
-  );
+	.route('/:id')
+	.put(
+		restrictTo(UserType.USER),
+		validationMiddleware({ body: [UpdateCartDto], params: [IdentifierDto] }),
+		cartController.updateCart,
+	)
+	.delete(restrictTo(UserType.USER), validationMiddleware({ params: [IdentifierDto] }), cartController.deleteCart);
 
-export default router;
+export const cartRoutes = router;

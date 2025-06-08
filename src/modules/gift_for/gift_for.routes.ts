@@ -13,34 +13,34 @@ const router = express.Router();
 router.use(protect);
 
 router
-    .route('/')
-    .post(
-        restrictTo(UserType.ADMIN),
-        validationMiddleware({ body: [CreateGiftForDto] }),
-        giftForController.createGiftFor
-    )
-    .get(
-        restrictTo(UserType.ADMIN, UserType.USER),
-        validationMiddleware({ query: [GetAllGiftForDto, GlobalPaginationDto, GlobalSearchDto] }),
-        giftForController.getAllGiftFor
-    );
+	.route('/')
+	.post(
+		restrictTo(UserType.ADMIN),
+		validationMiddleware({ body: [CreateGiftForDto] }),
+		giftForController.createGiftFor,
+	)
+	.get(
+		restrictTo(UserType.ADMIN, UserType.USER),
+		validationMiddleware({ query: [GetAllGiftForDto, GlobalPaginationDto, GlobalSearchDto] }),
+		giftForController.getAllGiftFor,
+	);
 
 router
-    .route('/:id')
-    .get(
-        restrictTo(UserType.ADMIN, UserType.USER),
-        validationMiddleware({ params: [IdentifierDto] }),
-        giftForController.getGiftForById
-    )
-    .put(
-        restrictTo(UserType.ADMIN),
-        validationMiddleware({ body: [UpdateGiftForDto], params: [IdentifierDto] }),
-        giftForController.updateGiftFor
-    )
-    .delete(
-        restrictTo(UserType.ADMIN),
-        validationMiddleware({ params: [IdentifierDto] }),
-        giftForController.deleteGiftFor
-    );
+	.route('/:id')
+	.get(
+		restrictTo(UserType.ADMIN, UserType.USER),
+		validationMiddleware({ params: [IdentifierDto] }),
+		giftForController.getGiftForById,
+	)
+	.put(
+		restrictTo(UserType.ADMIN),
+		validationMiddleware({ body: [UpdateGiftForDto], params: [IdentifierDto] }),
+		giftForController.updateGiftFor,
+	)
+	.delete(
+		restrictTo(UserType.ADMIN),
+		validationMiddleware({ params: [IdentifierDto] }),
+		giftForController.deleteGiftFor,
+	);
 
-export default router;
+export const giftForRoutes = router;

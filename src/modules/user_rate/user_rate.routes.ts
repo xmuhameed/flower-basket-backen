@@ -13,34 +13,34 @@ const router = Router();
 router.use(protect);
 
 router
-  .route('/')
-  .post(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ body: [CreateUserRateDto] }),
-    userRateController.createUserRate
-  )
-  .get(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ query: [GetAllUserRatesDto, GlobalPaginationDto] }),
-    userRateController.getAllUserRates
-  );
+	.route('/')
+	.post(
+		restrictTo(UserType.USER),
+		validationMiddleware({ body: [CreateUserRateDto] }),
+		userRateController.createUserRate,
+	)
+	.get(
+		restrictTo(UserType.ADMIN, UserType.USER),
+		validationMiddleware({ query: [GetAllUserRatesDto, GlobalPaginationDto] }),
+		userRateController.getAllUserRates,
+	);
 
 router
-  .route('/:id')
-  .get(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ params: [IdentifierDto] }),
-    userRateController.getUserRateById
-  )
-  .put(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ body: [UpdateUserRateDto], params: [IdentifierDto] }),
-    userRateController.updateUserRate
-  )
-  .delete(
-    restrictTo(UserType.ADMIN, UserType.USER),
-    validationMiddleware({ params: [IdentifierDto] }),
-    userRateController.deleteUserRate
-  );
+	.route('/:id')
+	.get(
+		restrictTo(UserType.ADMIN, UserType.USER),
+		validationMiddleware({ params: [IdentifierDto] }),
+		userRateController.getUserRateById,
+	)
+	.put(
+		restrictTo(UserType.USER),
+		validationMiddleware({ body: [UpdateUserRateDto], params: [IdentifierDto] }),
+		userRateController.updateUserRate,
+	)
+	.delete(
+		restrictTo(UserType.USER),
+		validationMiddleware({ params: [IdentifierDto] }),
+		userRateController.deleteUserRate,
+	);
 
-export default router;
+export const userRateRoutes = router;

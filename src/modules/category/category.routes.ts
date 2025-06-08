@@ -13,34 +13,34 @@ const router = express.Router();
 router.use(protect);
 
 router
-    .route('/')
-    .post(
-        restrictTo(UserType.ADMIN),
-        validationMiddleware({ body: [CreateCategoryDto] }),
-        categoryController.createCategory
-    )
-    .get(
-        restrictTo(UserType.ADMIN, UserType.USER),
-        validationMiddleware({ query: [GetAllCategoriesDto, GlobalPaginationDto, GlobalSearchDto] }),
-        categoryController.getAllCategories
-    );
+	.route('/')
+	.post(
+		restrictTo(UserType.ADMIN),
+		validationMiddleware({ body: [CreateCategoryDto] }),
+		categoryController.createCategory,
+	)
+	.get(
+		restrictTo(UserType.ADMIN, UserType.USER),
+		validationMiddleware({ query: [GetAllCategoriesDto, GlobalPaginationDto, GlobalSearchDto] }),
+		categoryController.getAllCategories,
+	);
 
 router
-    .route('/:id')
-    .get(
-        restrictTo(UserType.ADMIN, UserType.USER),
-        validationMiddleware({ params: [IdentifierDto] }),
-        categoryController.getCategoryById
-    )
-    .put(
-        restrictTo(UserType.ADMIN),
-        validationMiddleware({ body: [UpdateCategoryDto], params: [IdentifierDto] }),
-        categoryController.updateCategory
-    )
-    .delete(
-        restrictTo(UserType.ADMIN),
-        validationMiddleware({ params: [IdentifierDto] }),
-        categoryController.deleteCategory
-    );
+	.route('/:id')
+	.get(
+		restrictTo(UserType.ADMIN, UserType.USER),
+		validationMiddleware({ params: [IdentifierDto] }),
+		categoryController.getCategoryById,
+	)
+	.put(
+		restrictTo(UserType.ADMIN),
+		validationMiddleware({ body: [UpdateCategoryDto], params: [IdentifierDto] }),
+		categoryController.updateCategory,
+	)
+	.delete(
+		restrictTo(UserType.ADMIN),
+		validationMiddleware({ params: [IdentifierDto] }),
+		categoryController.deleteCategory,
+	);
 
-export default router;
+export const categoryRoutes = router;

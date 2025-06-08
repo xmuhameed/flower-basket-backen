@@ -10,117 +10,115 @@ import { deleteFile, saveFile } from '../../shared/middleware/save-file.middlewa
 const prisma = new PrismaClient();
 
 export const createBrand = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const dto = req.body as CreateBrandDto;
-        const uniqueBrandCode = await nanoid(10);
-        const brandData: Prisma.brandCreateInput = {
-            name: dto.name,
-            qrcode: uniqueBrandCode,
-        };
-        const nestedFolder = `brands/brand-${uniqueBrandCode}`;
-        if (req.files?.['brand_image']) {
-            const result = await saveFile(nestedFolder, req.files['brand_image'] as any, {
-                prefix: 'brand-',
-                allowedExtensions: ['.jpg', '.png', '.jpeg'],
-            });
-            brandData.brand_image_url = result.relativePath;
-        }
-        const brand = await prisma.brand.create({ data: brandData });
-        res.status(201).json({ success: true, data: brand });
-    } catch (err) {
-        next(err);
-    }
+	try {
+		const dto = req.body as CreateBrandDto;
+		const uniqueBrandCode = await nanoid(10);
+		const brandData: Prisma.brandCreateInput = {
+			name: dto.name,
+			qrcode: uniqueBrandCode,
+		};
+		const nestedFolder = `brands/brand-${uniqueBrandCode}`;
+		if (req.files?.['brand_image']) {
+			const result = await saveFile(nestedFolder, req.files['brand_image'] as any, {
+				prefix: 'brand-',
+				allowedExtensions: ['.jpg', '.png', '.jpeg'],
+			});
+			brandData.brand_image_url = result.relativePath;
+		}
+		const brand = await prisma.brand.create({ data: brandData });
+		res.status(201).json({ success: true, data: brand });
+	} catch (err) {
+		next(err);
+	}
 };
 
 export const getAllBrands = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const dto = req.query as GetAllBrandsDto;
-        const pagination = req.query as GlobalPaginationDto;
-        const search = req.query as GlobalSearchDto;
-        const whereObj: Prisma.brandWhereInput = {
-            deleted: false,
-        };
-        if (search.search) {
-            whereObj.OR = [
-                { name: { contains: search.search } },
-            ];
-        }
-        const brands = await prisma.brand.findMany({
-            where: whereObj,
-            orderBy: { name: 'asc' },
-            ...checkPagination(pagination),
-        });
-        const totalBrands = await prisma.brand.count({ where: whereObj });
-        res.status(200).json({ success: true, count: totalBrands, data: brands });
-    } catch (err) {
-        next(err);
-    }
+	try {
+		const dto = req.query as GetAllBrandsDto;
+		const pagination = req.query as GlobalPaginationDto;
+		const search = req.query as GlobalSearchDto;
+		const whereObj: Prisma.brandWhereInput = {
+			deleted: false,
+		};
+		if (search.search) {
+			whereObj.OR = [{ name: { contains: search.search } }];
+		}
+		const brands = await prisma.brand.findMany({
+			where: whereObj,
+			orderBy: { name: 'asc' },
+			...checkPagination(pagination),
+		});
+		const totalBrands = await prisma.brand.count({ where: whereObj });
+		res.status(200).json({ success: true, count: totalBrands, data: brands });
+	} catch (err) {
+		next(err);
+	}
 };
 
 export const getBrandById = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const dto = req.params as any as IdentifierDto;
-        const brand = await prisma.brand.findUnique({
-            where: { id: dto.id, deleted: false },
-        });
-        if (!brand) {
-            return next(new Error('Brand not found'));
-        }
-        res.status(200).json({ success: true, data: brand });
-    } catch (err) {
-        next(err);
-    }
+	try {
+		const dto = req.params as any as IdentifierDto;
+		const brand = await prisma.brand.findUnique({
+			where: { id: dto.id, deleted: false },
+		});
+		if (!brand) {
+			return next(new Error('Brand not found'));
+		}
+		res.status(200).json({ success: true, data: brand });
+	} catch (err) {
+		next(err);
+	}
 };
 
 export const updateBrand = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const dto = req.body as UpdateBrandDto;
-        const identifier = req.params as any as IdentifierDto;
-        const brand = await prisma.brand.findUnique({
-            where: { id: identifier.id, deleted: false },
-        });
-        if (!brand) {
-            return next(new Error('Brand not found'));
-        }
-        const brandData: Prisma.brandUpdateInput = {
-            ...(dto.name && { name: dto.name }),
-        };
-        const nestedFolder = `brands/brand-${brand.qrcode}`;
-        if (req.files?.['brand_image']) {
-            if (brand.brand_image_url) {
-                await deleteFile(brand.brand_image_url);
-            }
-            const result = await saveFile(nestedFolder, req.files['brand_image'] as any, {
-                prefix: 'brand-',
-                allowedExtensions: ['.jpg', '.png', '.jpeg'],
-            });
-            brandData.brand_image_url = result.relativePath;
-        }
-        const updatedBrand = await prisma.brand.update({
-            where: { id: identifier.id },
-            data: brandData,
-        });
-        res.status(200).json({ success: true, data: updatedBrand });
-    } catch (err) {
-        next(err);
-    }
+	try {
+		const dto = req.body as UpdateBrandDto;
+		const identifier = req.params as any as IdentifierDto;
+		const brand = await prisma.brand.findUnique({
+			where: { id: identifier.id, deleted: false },
+		});
+		if (!brand) {
+			return next(new Error('Brand not found'));
+		}
+		const brandData: Prisma.brandUpdateInput = {
+			...(dto.name && { name: dto.name }),
+		};
+		const nestedFolder = `brands/brand-${brand.qrcode}`;
+		if (req.files?.['brand_image']) {
+			if (brand.brand_image_url) {
+				await deleteFile(brand.brand_image_url);
+			}
+			const result = await saveFile(nestedFolder, req.files['brand_image'] as any, {
+				prefix: 'brand-',
+				allowedExtensions: ['.jpg', '.png', '.jpeg'],
+			});
+			brandData.brand_image_url = result.relativePath;
+		}
+		const updatedBrand = await prisma.brand.update({
+			where: { id: identifier.id },
+			data: brandData,
+		});
+		res.status(200).json({ success: true, data: updatedBrand });
+	} catch (err) {
+		next(err);
+	}
 };
 
 export const deleteBrand = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const identifier = req.params as any as IdentifierDto;
-        const brand = await prisma.brand.findUnique({
-            where: { id: identifier.id, deleted: false },
-        });
-        if (!brand) {
-            return next(new Error('Brand not found'));
-        }
-        await prisma.brand.update({
-            where: { id: identifier.id },
-            data: { deleted: true },
-        });
-        res.status(200).json({ success: true, message: 'Brand deleted successfully' });
-    } catch (err) {
-        next(err);
-    }
+	try {
+		const identifier = req.params as any as IdentifierDto;
+		const brand = await prisma.brand.findUnique({
+			where: { id: identifier.id, deleted: false },
+		});
+		if (!brand) {
+			return next(new Error('Brand not found'));
+		}
+		await prisma.brand.update({
+			where: { id: identifier.id },
+			data: { deleted: true },
+		});
+		res.status(200).json({ success: true, message: 'Brand deleted successfully' });
+	} catch (err) {
+		next(err);
+	}
 };

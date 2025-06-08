@@ -15,20 +15,20 @@ router
 	.route('/')
 	.post(restrictTo(UserType.ADMIN), validationMiddleware({ body: [CreateAdminDto] }), adminController.createAdmin)
 	.get(
-        restrictTo(UserType.ADMIN),
+		restrictTo(UserType.ADMIN),
 		validationMiddleware({ query: [GetAllAdminsDto, GlobalPaginationDto, GlobalSearchDto] }),
 		adminController.getAllAdmins,
 	);
-    
 
 router
-	.route('/:id')
-	.get(restrictTo(UserType.ADMIN), validationMiddleware({ params: [IdentifierDto] }), adminController.getAdminById)
-	.delete(restrictTo(UserType.ADMIN), validationMiddleware({ params: [IdentifierDto] }), adminController.deleteAdmin)
-	.patch(
-		restrictTo(UserType.ADMIN),
-		validationMiddleware({ body: [UpdateAdminDto], params: [IdentifierDto] }),
-		adminController.updateAdmin,
-	);
+.route('/:id')
+.get(restrictTo(UserType.ADMIN), validationMiddleware({ params: [IdentifierDto] }), adminController.getAdminById)
+.delete(restrictTo(UserType.ADMIN), validationMiddleware({ params: [IdentifierDto] }), adminController.deleteAdmin)
+.patch(
+	restrictTo(UserType.ADMIN),
+	validationMiddleware({ body: [UpdateAdminDto], params: [IdentifierDto] }),
+	adminController.updateAdmin,
+);
+
 
 export const adminRoutes = router;

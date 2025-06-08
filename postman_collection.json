@@ -1,0 +1,1051 @@
+{
+	"info": {
+		"_postman_id": "{{randomId}}",
+		"name": "Floward Full API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:5000/api" },
+		{ "key": "token", "value": "<YOUR_TOKEN_HERE>" }
+	],
+	"item": [
+    {
+			"name": "Admins",
+			"item": [
+				{
+					"name": "Create Admin",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/admins", "host": ["{{baseUrl}}"], "path": ["admins"] },
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "fullname", "value": "Admin Name", "type": "text" },
+								{ "key": "gender", "value": "male", "type": "text" },
+								{ "key": "birth_date", "value": "1990-01-01", "type": "text" },
+								{ "key": "profile_image", "type": "file", "src": "" },
+								{ "key": "email", "value": "admin@example.com", "type": "text" },
+								{ "key": "password", "value": "password", "type": "text" },
+								{ "key": "phone", "value": "1234567890", "type": "text" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Admins",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/admins",
+							"host": ["{{baseUrl}}"],
+							"path": ["admins"],
+							"query": [
+								{ "key": "search", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Admin By Id",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/admins/:id", "host": ["{{baseUrl}}"], "path": ["admins", ":id"] }
+					}
+				},
+				{
+					"name": "Update Admin",
+					"request": {
+						"method": "PATCH",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/admins/:id", "host": ["{{baseUrl}}"], "path": ["admins", ":id"] },
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "fullname", "value": "Updated Admin Name", "type": "text" },
+								{ "key": "gender", "value": "female", "type": "text" },
+								{ "key": "birth_date", "value": "1995-05-05", "type": "text" },
+								{ "key": "profile_image", "type": "file", "src": "" },
+								{ "key": "email", "value": "updatedadmin@example.com", "type": "text" },
+								{ "key": "password", "value": "newpassword", "type": "text" },
+								{ "key": "phone", "value": "0987654321", "type": "text" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Admin",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/admins/:id", "host": ["{{baseUrl}}"], "path": ["admins", ":id"] }
+					}
+				}
+			]
+		},
+    {
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["users"],
+							"query": [
+								{ "key": "search", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/users/:id", "host": ["{{baseUrl}}"], "path": ["users", ":id"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  if (jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "  } else if (jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.data.token);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\",\n  \"fullname\": \"User Name\",\n  \"phone\": \"1234567890\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  var jsonData = pm.response.json();",
+                  "  if (jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "  } else if (jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.data.token);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+				{
+					"name": "Profile",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/auth/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "profile"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Address",
+			"item": [
+				{
+					"name": "Create Address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": { "raw": "{{baseUrl}}/addresses", "host": ["{{baseUrl}}"], "path": ["addresses"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": 1,\n  \"location_url\": \"string\",\n  \"recipient_name\": \"string\",\n  \"recipient_phone\": \"string\",\n  \"address\": \"string\",\n  \"city\": \"string\",\n  \"country\": \"SA\",\n  \"address_details\": \"string\",\n  \"zip_code\": \"string\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Get All Addresses",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/addresses",
+							"host": ["{{baseUrl}}"],
+							"path": ["addresses"],
+							"query": [
+								{ "key": "user_id", "value": "", "disabled": true },
+								{ "key": "search", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Address By Id",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/addresses/:id", "host": ["{{baseUrl}}"], "path": ["addresses", ":id"] }
+					}
+				},
+				{
+					"name": "Update Address",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/addresses/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["addresses", ":id"]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": 1,\n  \"location_url\": \"string\",\n  \"recipient_name\": \"string\",\n  \"recipient_phone\": \"string\",\n  \"address\": \"string\",\n  \"city\": \"string\",\n  \"country\": \"SA\",\n  \"address_details\": \"string\",\n  \"zip_code\": \"string\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Delete Address",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/addresses/:id", "host": ["{{baseUrl}}"], "path": ["addresses", ":id"] }
+					}
+				},
+				{
+          "name": "Get All Collections",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+            "url": {
+              "raw": "{{baseUrl}}/collection",
+              "host": ["{{baseUrl}}"],
+              "path": ["collection"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "pageItemsCount", "value": "10", "disabled": true }
+              ]
+            }
+          }
+        }
+			]
+		},
+		{
+			"name": "Collection",
+			"item": [
+				{
+          "name": "Create Collection",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": { "raw": "{{baseUrl}}/collections", "host": ["{{baseUrl}}"], "path": ["collections"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Collection Name", "type": "text" },
+                { "key": "sort", "value": "1", "type": "text" },
+                { "key": "collection_image", "type": "file", "src": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Collections",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+            "url": {
+              "raw": "{{baseUrl}}/collections",
+              "host": ["{{baseUrl}}"],
+              "path": ["collections"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "pageItemsCount", "value": "10", "disabled": true }
+              ]
+            }
+          }
+        },
+				{
+					"name": "Get Collection By Id",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/collections/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["collections", ":id"]
+						}
+					}
+				},
+				{
+					"name": "Update Collection",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/collections/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["collections", ":id"]
+						},
+						"body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Collection Name", "type": "text" },
+                { "key": "sort", "value": "1", "type": "text" },
+                { "key": "collection_image", "type": "file", "src": "" }
+              ]
+            }
+					}
+				},
+				{
+					"name": "Delete Collection",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/collections/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["collections", ":id"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Category",
+			"item": [
+				{
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+            ],
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Category Name", "type": "text" },
+                { "key": "sort", "value": "1", "type": "text" },
+                { "key": "category_image", "type": "file", "src": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "page", "value": "1", "disabled": true },
+                { "key": "pageItemsCount", "value": "10", "disabled": true }
+              ]
+            }
+          }
+        },
+				{
+					"name": "Get Category By Id",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/categories/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["categories", ":id"]
+						}
+					}
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/categories/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["categories", ":id"]
+						},
+						"body": { 
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Category Name", "type": "text" },
+                { "key": "sort", "value": "1", "type": "text" },
+                { "key": "category_image", "type": "file", "src": "" }
+              ]
+            }
+					}
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/categories/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["categories", ":id"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Brand",
+			"item": [
+				{
+					"name": "Create Brand",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "Brand Name", "type": "text" },
+								{ "key": "brand_image", "type": "file", "src": "" }
+							]
+						},
+						"url": { "raw": "{{baseUrl}}/brands", "host": ["{{baseUrl}}"], "path": ["brands"] }
+					}
+				},
+				{
+					"name": "Get All Brands",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/brands",
+							"host": ["{{baseUrl}}"],
+							"path": ["brands"],
+							"query": [
+								{ "key": "search", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Brand By Id",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/brands/:id", "host": ["{{baseUrl}}"], "path": ["brands", ":id"] }
+					}
+				},
+				{
+					"name": "Update Brand",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "Brand Name", "type": "text" },
+								{ "key": "brand_image", "type": "file", "src": "" }
+							]
+						},
+						"url": { "raw": "{{baseUrl}}/brands/:id", "host": ["{{baseUrl}}"], "path": ["brands", ":id"] }
+					}
+				},
+				{
+					"name": "Delete Brand",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/brands/:id", "host": ["{{baseUrl}}"], "path": ["brands", ":id"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Gift For",
+			"item": [
+				{
+					"name": "Create Gift For",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/gift-for", "host": ["{{baseUrl}}"], "path": ["gift-for"] },
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "Birthday", "type": "text" },
+								{ "key": "sort", "value": "1", "type": "text" },
+								{ "key": "gift_for_image", "type": "file", "src": "" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Gift For",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/gift-for",
+							"host": ["{{baseUrl}}"],
+							"path": ["gift-for"],
+							"query": [
+								{ "key": "id", "value": "", "disabled": true },
+								{ "key": "name", "value": "", "disabled": true },
+								{ "key": "search", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Gift For By Id",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/gift-for/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["gift-for", ":id"]
+						}
+					}
+				},
+				{
+					"name": "Update Gift For",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/gift-for/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["gift-for", ":id"]
+						},
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "Anniversary", "type": "text" },
+								{ "key": "sort", "value": "2", "type": "text" },
+								{ "key": "gift_for_image", "type": "file", "src": "" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Gift For",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/gift-for/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["gift-for", ":id"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Home Slider",
+			"item": [
+				{
+					"name": "Create Home Slider",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/home-sliders", "host": ["{{baseUrl}}"], "path": ["home-sliders"] },
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "Main Banner", "type": "text" },
+								{ "key": "sort", "value": "1", "type": "text" },
+								{ "key": "slider_image", "type": "file", "src": "" },
+								{ "key": "button_text", "value": "Shop Now", "type": "text" },
+								{ "key": "button_url", "value": "https://example.com", "type": "text" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Home Sliders",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/home-sliders",
+							"host": ["{{baseUrl}}"],
+							"path": ["home-sliders"],
+							"query": [
+								{ "key": "search", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Home Slider By Id",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/home-sliders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["home-sliders", ":id"]
+						}
+					}
+				},
+				{
+					"name": "Update Home Slider",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/home-sliders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["home-sliders", ":id"]
+						},
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "Updated Banner", "type": "text" },
+								{ "key": "sort", "value": "2", "type": "text" },
+								{ "key": "slider_image", "type": "file", "src": "" },
+								{ "key": "button_text", "value": "Learn More", "type": "text" },
+								{ "key": "button_url", "value": "https://example.com/updated", "type": "text" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Home Slider",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/home-sliders/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["home-sliders", ":id"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/products", "host": ["{{baseUrl}}"], "path": ["products"] },
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "Sample Product", "type": "text" },
+								{ "key": "price", "value": "100", "type": "text" },
+								{ "key": "currency", "value": "SAR", "type": "text" },
+								{ "key": "category_id", "value": "1", "type": "text" },
+								{ "key": "collection_id", "value": "1", "type": "text" },
+								{ "key": "gift_for_id", "value": "1", "type": "text" },
+								{ "key": "brand_id", "value": "1", "type": "text" },
+								{
+									"key": "product_images",
+									"type": "file",
+									"src": "",
+									"description": "Upload one or more images"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"],
+							"query": [
+								{ "key": "category_id", "value": "", "disabled": true },
+								{ "key": "collection_id", "value": "", "disabled": true },
+								{ "key": "gift_for_id", "value": "", "disabled": true },
+								{ "key": "brand_id", "value": "", "disabled": true },
+								{ "key": "sort_by", "value": "", "disabled": true },
+								{ "key": "order", "value": "", "disabled": true },
+								{ "key": "search", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Product By Id",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/products/:id", "host": ["{{baseUrl}}"], "path": ["products", ":id"] }
+					}
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/products/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", ":id"]
+						},
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "name", "value": "Updated Product", "type": "text" },
+								{ "key": "price", "value": "150", "type": "text" },
+								{ "key": "currency", "value": "SAR", "type": "text" },
+								{ "key": "category_id", "value": "2", "type": "text" },
+								{ "key": "collection_id", "value": "2", "type": "text" },
+								{ "key": "gift_for_id", "value": "2", "type": "text" },
+								{ "key": "brand_id", "value": "2", "type": "text" },
+								{
+									"key": "product_images",
+									"type": "file",
+									"src": "",
+									"description": "Upload one or more images"
+								},
+								{ "key": "deleted_images", "value": "[\"old_image1.jpg\"]", "type": "text" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/products/:id", "host": ["{{baseUrl}}"], "path": ["products", ":id"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Favorite",
+			"item": [
+				{
+					"name": "Create Favorite",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": { "raw": "{{baseUrl}}/favorites", "host": ["{{baseUrl}}"], "path": ["favorites"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product_id\": 1\n}"
+						}
+					}
+				},
+				{
+					"name": "Get All Favorites",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/favorites",
+							"host": ["{{baseUrl}}"],
+							"path": ["favorites"],
+							"query": [
+								{ "key": "user_id", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Favorite",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/favorites/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["favorites", ":id"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "User Rate",
+			"item": [
+				{
+					"name": "Create User Rate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": { "raw": "{{baseUrl}}/user-rates", "host": ["{{baseUrl}}"], "path": ["user-rates"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product_id\": 1,\n  \"rate\": 5,\n  \"rate_text\": \"Great product!\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Get All User Rates",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/user-rates",
+							"host": ["{{baseUrl}}"],
+							"path": ["user-rates"],
+							"query": [
+								{ "key": "user_id", "value": "", "disabled": true },
+								{ "key": "product_id", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User Rate By Id",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/user-rates/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["user-rates", ":id"]
+						}
+					}
+				},
+				{
+					"name": "Update User Rate",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/user-rates/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["user-rates", ":id"]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rate\": 4,\n  \"rate_text\": \"Good!\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Delete User Rate",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/user-rates/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["user-rates", ":id"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "Create Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": { "raw": "{{baseUrl}}/carts", "host": ["{{baseUrl}}"], "path": ["carts"] },
+						"body": { "mode": "raw", "raw": "{\n  \"product_id\": 1,\n  \"quantity\": 2\n}" }
+					}
+				},
+				{
+					"name": "Get All Carts",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/carts",
+							"host": ["{{baseUrl}}"],
+							"path": ["carts"],
+							"query": [
+								{ "key": "product_id", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Cart",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": { "raw": "{{baseUrl}}/carts/:id", "host": ["{{baseUrl}}"], "path": ["carts", ":id"] },
+						"body": { "mode": "raw", "raw": "{\n  \"quantity\": 3\n}" }
+					}
+				},
+				{
+					"name": "Delete Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/carts/:id", "host": ["{{baseUrl}}"], "path": ["carts", ":id"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": { "raw": "{{baseUrl}}/orders", "host": ["{{baseUrl}}"], "path": ["orders"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cart_user_id\": 1,\n  \"product_id\": 1,\n  \"quantity\": 2,\n  \"address_id\": 1\n}"
+						}
+					}
+				},
+				{
+					"name": "Get All Orders",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders"],
+							"query": [
+								{ "key": "user_id", "value": "", "disabled": true },
+								{ "key": "product_id", "value": "", "disabled": true },
+								{ "key": "address_id", "value": "", "disabled": true },
+								{ "key": "status", "value": "", "disabled": true },
+								{ "key": "order_serial", "value": "", "disabled": true },
+								{ "key": "search", "value": "", "disabled": true },
+								{ "key": "page", "value": "1", "disabled": true },
+								{ "key": "pageItemsCount", "value": "10", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Order By Id",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/orders/:id", "host": ["{{baseUrl}}"], "path": ["orders", ":id"] }
+					}
+				},
+				{
+					"name": "Change Order Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+							{ "key": "Content-Type", "value": "application/json", "type": "text" }
+						],
+						"url": { "raw": "{{baseUrl}}/orders/:id", "host": ["{{baseUrl}}"], "path": ["orders", ":id"] },
+						"body": { "mode": "raw", "raw": "{\n  \"status\": \"delivered\"\n}" }
+					}
+				}
+			]
+		}
+	]
+}

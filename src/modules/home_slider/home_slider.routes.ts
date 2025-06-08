@@ -43,4 +43,4 @@ router
 		homeSliderController.deleteHomeSlider,
 	);
 
-export default router;
+export const homeSliderRoutes = router;

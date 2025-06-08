@@ -13,34 +13,26 @@ const router = express.Router();
 router.use(protect);
 
 router
-    .route('/')
-    .post(
-        restrictTo(UserType.ADMIN),
-        validationMiddleware({ body: [CreateBrandDto] }),
-        brandController.createBrand
-    )
-    .get(
-        restrictTo(UserType.ADMIN, UserType.USER),
-        validationMiddleware({ query: [GetAllBrandsDto, GlobalPaginationDto, GlobalSearchDto] }),
-        brandController.getAllBrands
-    );
+	.route('/')
+	.post(restrictTo(UserType.ADMIN), validationMiddleware({ body: [CreateBrandDto] }), brandController.createBrand)
+	.get(
+		restrictTo(UserType.ADMIN, UserType.USER),
+		validationMiddleware({ query: [GetAllBrandsDto, GlobalPaginationDto, GlobalSearchDto] }),
+		brandController.getAllBrands,
+	);
 
 router
-    .route('/:id')
-    .get(
-        restrictTo(UserType.ADMIN, UserType.USER),
-        validationMiddleware({ params: [IdentifierDto] }),
-        brandController.getBrandById
-    )
-    .put(
-        restrictTo(UserType.ADMIN),
-        validationMiddleware({ body: [UpdateBrandDto], params: [IdentifierDto] }),
-        brandController.updateBrand
-    )
-    .delete(
-        restrictTo(UserType.ADMIN),
-        validationMiddleware({ params: [IdentifierDto] }),
-        brandController.deleteBrand
-    );
+	.route('/:id')
+	.get(
+		restrictTo(UserType.ADMIN, UserType.USER),
+		validationMiddleware({ params: [IdentifierDto] }),
+		brandController.getBrandById,
+	)
+	.put(
+		restrictTo(UserType.ADMIN),
+		validationMiddleware({ body: [UpdateBrandDto], params: [IdentifierDto] }),
+		brandController.updateBrand,
+	)
+	.delete(restrictTo(UserType.ADMIN), validationMiddleware({ params: [IdentifierDto] }), brandController.deleteBrand);
 
-export default router;
+export const brandRoutes = router;

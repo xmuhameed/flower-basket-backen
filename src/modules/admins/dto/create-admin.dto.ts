@@ -1,6 +1,5 @@
 import { gender } from '.prisma/client';
-import { Transform } from 'class-transformer';
-import { IsString, IsNotEmpty, IsEmail, IsNumber, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
 export class CreateAdminDto {
 	@IsString()
 	@IsNotEmpty()
@@ -16,15 +15,11 @@ export class CreateAdminDto {
 
 	@IsString()
 	@IsOptional()
-	profile_image_url: string;
+	profile_image: string;
 
 	@IsEmail()
 	@IsNotEmpty()
 	email: string;
-
-	@IsString()
-	@IsOptional()
-	phone_number: string;
 
 	@IsString()
 	@IsNotEmpty()

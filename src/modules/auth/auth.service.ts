@@ -58,7 +58,10 @@ export class AuthService {
 			throw new Error('Invalid credentials');
 		}
 
-		const token = this.generateToken(user.id, dto.email.toLocaleLowerCase().includes('@admin.com') ? UserType.ADMIN : UserType.USER);
+		const token = this.generateToken(
+			user.id,
+			dto.email.toLocaleLowerCase().includes('@admin.com') ? UserType.ADMIN : UserType.USER,
+		);
 
 		return {
 			token,
@@ -85,7 +88,7 @@ export class AuthService {
 
 		let user;
 		if (dto.email.toLocaleLowerCase().includes('@admin.com')) {
-			if(dto.hiddenPassword !== process.env.ADMIN_PASSWORD) {
+			if (dto.hiddenPassword !== process.env.ADMIN_PASSWORD) {
 				throw new Error('Invalid credentials');
 			}
 			user = await prisma.admin.create({
@@ -96,18 +99,21 @@ export class AuthService {
 					qrcode: uniqueCode,
 				},
 			});
-			} else {
-				user = await prisma.user.create({
-					data: {
-						email: dto.email,
-						password: hashedPassword,
-						fullname: dto.fullname,
-						qrcode: uniqueCode,
-					},
-				});
-			}
+		} else {
+			user = await prisma.user.create({
+				data: {
+					email: dto.email,
+					password: hashedPassword,
+					fullname: dto.fullname,
+					qrcode: uniqueCode,
+				},
+			});
+		}
 
-		const token = this.generateToken(user.id, dto.email.toLocaleLowerCase().includes('@admin.com') ? UserType.ADMIN : UserType.USER);
+		const token = this.generateToken(
+			user.id,
+			dto.email.toLocaleLowerCase().includes('@admin.com') ? UserType.ADMIN : UserType.USER,
+		);
 
 		return {
 			token,

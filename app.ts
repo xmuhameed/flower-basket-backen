@@ -15,12 +15,23 @@ import AppError from './utils/appError';
 import errorController from './src/shared/controllers/errorController';
 import { authRoutes } from './src/modules/auth/auth.routes';
 import { adminRoutes } from './src/modules/admins/admins.routes';
+import { addressRoutes } from './src/modules/address/address.routes';
+import { brandRoutes } from './src/modules/brand/brand.routes';
+import { collectionRoutes } from './src/modules/collection/collection.routes';
+import { categoryRoutes } from './src/modules/category/category.routes';
+import { giftForRoutes } from './src/modules/gift_for/gift_for.routes';
+import { homeSliderRoutes } from './src/modules/home_slider/home_slider.routes';
+import { orderRoutes } from './src/modules/order/order.routes';
+import { productRoutes } from './src/modules/product/product.routes';
+import { userRateRoutes } from './src/modules/user_rate/user_rate.routes';
+import { favoriteRoutes } from './src/modules/favorite/favorite.routes';
+import { cartRoutes } from './src/modules/cart/cart.routes';
+import { userRoutes } from './src/modules/users/users.routes';
 
 const app = express();
 
 app.use(fileUpload());
 const httpServer = createServer(app);
-
 
 // to Add view engine and views uncomment this two lines
 // app.set('view engine', 'pug');
@@ -63,24 +74,18 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admins', adminRoutes);
-
-import collectionRoutes from './src/modules/collection/collection.routes';
-import homeSliderRoutes from './src/modules/home_slider/home_slider.routes';
-import brandRoutes from './src/modules/brand/brand.routes';
-import giftForRoutes from './src/modules/gift_for/gift_for.routes';
-
-app.use('/api/collection', collectionRoutes);
-app.use('/api/home-slider', homeSliderRoutes);
-app.use('/api/brand', brandRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/addresses', addressRoutes);
+app.use('/api/brands', brandRoutes);
+app.use('/api/collections', collectionRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/gift-for', giftForRoutes);
-
-import productRoutes from './src/modules/product/product.routes';
-app.use('/api/product', productRoutes);
-
-app.use('/api/user-rate', require('./src/modules/user_rate/user_rate.routes').default);
-app.use('/api/favorite', require('./src/modules/favorite/favorite.routes').default);
-app.use('/api/cart', require('./src/modules/cart/cart.routes').default);
-app.use('/api/order', require('./src/modules/order/order.routes').default);
+app.use('/api/home-sliders', homeSliderRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/user-rates', userRateRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/carts', cartRoutes);
 
 // Unhandled Routes
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
