@@ -73,6 +73,35 @@ export const getCategoryById = async (req: Request, res: Response, next: NextFun
 		const dto = req.params as any as IdentifierDto;
 		const category = await prisma.category.findUnique({
 			where: { id: dto.id, deleted: false },
+			select: {
+				id: true,
+				name: true,
+				sort: true,
+				qrcode: true,
+				category_image_url: true,
+				createdAt: true,
+				updatedAt: true,
+				product: {
+					select: {
+						id: true,
+						name: true,
+						price: true,
+						currency: true,
+						description: true,
+						how_to_care: true,
+						content: true,
+						alert: true,
+						dimensions: true,
+						category: { select: { id: true, name: true } },
+						collection: { select: { id: true, name: true } },
+						gift_for: { select: { id: true, name: true } },
+						brand: { select: { id: true, name: true } },
+						product_image: true,
+						createdAt: true,
+						updatedAt: true,
+					}
+				}
+			}
 		});
 		if (!category) {
 			return next(new Error('Category not found'));

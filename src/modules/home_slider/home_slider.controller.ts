@@ -63,6 +63,17 @@ export const getHomeSliderById = async (req: Request, res: Response, next: NextF
 		const dto = req.params as any as IdentifierDto;
 		const slider = await prisma.home_slider.findUnique({
 			where: { id: dto.id, deleted: false },
+			select: {
+				id: true,
+				qrcode: true,
+				name: true,
+				sort: true,
+				button_text: true,
+				button_url: true,
+				slider_image_url: true,
+				createdAt: true,
+				updatedAt: true,
+			}
 		});
 		if (!slider) {
 			return next(new Error('HomeSlider not found'));

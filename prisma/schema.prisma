@@ -91,6 +91,24 @@ model address {
     @@index([deleted])
 }
 
+model product_type {
+    id Int @id @default(autoincrement())
+    qrcode String @unique
+
+    name String @unique
+
+    sort Int @unique @default(0)
+    product_type_image_url String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+    product product[]
+
+    @@index([deleted])
+}
+
 model category {
     id     Int    @id @default(autoincrement())
     qrcode String @unique
@@ -199,6 +217,9 @@ model product {
     updatedAt DateTime @default(now()) @updatedAt
 
     deleted Boolean @default(false)
+
+    product_type_id Int?
+    product_type    product_type? @relation(fields: [product_type_id], references: [id])
 
     category_id Int?
     category    category? @relation(fields: [category_id], references: [id])

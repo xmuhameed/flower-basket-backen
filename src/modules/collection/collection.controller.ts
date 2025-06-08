@@ -61,6 +61,35 @@ export const getCollectionById = async (req: Request, res: Response, next: NextF
 		const dto = req.params as any as IdentifierDto;
 		const collection = await prisma.collection.findUnique({
 			where: { id: dto.id, deleted: false },
+			select: {
+				id: true,
+				name: true,
+				sort: true,
+				qrcode: true,
+				collection_image_url: true,
+				createdAt: true,
+				updatedAt: true,
+				product: {
+					select: {
+						id: true,
+						name: true,
+						price: true,
+						currency: true,
+						description: true,
+						how_to_care: true,
+						content: true,
+						alert: true,
+						dimensions: true,
+						category: { select: { id: true, name: true } },
+						collection: { select: { id: true, name: true } },
+						gift_for: { select: { id: true, name: true } },
+						brand: { select: { id: true, name: true } },
+						product_image: true,
+						createdAt: true,
+						updatedAt: true,
+					},
+				},
+			},
 		});
 		if (!collection) {
 			return next(new Error('Collection not found'));

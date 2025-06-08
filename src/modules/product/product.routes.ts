@@ -10,6 +10,15 @@ import { UserType } from '../auth/dto';
 
 const router = Router();
 
+router
+	.route('/')
+	.get(
+		validationMiddleware({ query: [GetAllProductsDto, GlobalPaginationDto, GlobalSearchDto] }),
+		productController.getAllProducts,
+	);
+
+router.route('/:id').get(validationMiddleware({ params: [IdentifierDto] }), productController.getProductById);
+
 router.use(protect);
 
 router
@@ -18,20 +27,10 @@ router
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [CreateProductDto] }),
 		productController.createProduct,
-	)
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ query: [GetAllProductsDto, GlobalPaginationDto, GlobalSearchDto] }),
-		productController.getAllProducts,
 	);
 
 router
 	.route('/:id')
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ params: [IdentifierDto] }),
-		productController.getProductById,
-	)
 	.put(
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [UpdateProductDto], params: [IdentifierDto] }),

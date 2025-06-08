@@ -61,6 +61,35 @@ export const getGiftForById = async (req: Request, res: Response, next: NextFunc
 		const dto = req.params as any as IdentifierDto;
 		const giftFor = await prisma.gift_for.findUnique({
 			where: { id: dto.id, deleted: false },
+			select: {
+				id: true,
+				qrcode: true,
+				name: true,
+				sort: true,
+				gift_for_image_url: true,
+				createdAt: true,
+				updatedAt: true,
+				product: {
+					select: {
+						id: true,
+						name: true,
+						price: true,
+						currency: true,
+						description: true,
+						how_to_care: true,
+						content: true,
+						alert: true,
+						dimensions: true,
+						category: { select: { id: true, name: true } },
+						collection: { select: { id: true, name: true } },
+						gift_for: { select: { id: true, name: true } },
+						brand: { select: { id: true, name: true } },
+						product_image: true,
+						createdAt: true,
+						updatedAt: true,
+					}
+				}
+			}
 		});
 		if (!giftFor) {
 			return next(new Error('GiftFor not found'));

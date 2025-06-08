@@ -10,24 +10,23 @@ import { UserType } from '../auth/dto';
 
 const router = express.Router();
 
-router.use(protect);
-
 router
 	.route('/')
-	.post(restrictTo(UserType.ADMIN), validationMiddleware({ body: [CreateBrandDto] }), brandController.createBrand)
 	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
 		validationMiddleware({ query: [GetAllBrandsDto, GlobalPaginationDto, GlobalSearchDto] }),
 		brandController.getAllBrands,
 	);
 
+router.route('/:id').get(validationMiddleware({ params: [IdentifierDto] }), brandController.getBrandById);
+
+router.use(protect);
+
+router
+	.route('/')
+	.post(restrictTo(UserType.ADMIN), validationMiddleware({ body: [CreateBrandDto] }), brandController.createBrand);
+
 router
 	.route('/:id')
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ params: [IdentifierDto] }),
-		brandController.getBrandById,
-	)
 	.put(
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [UpdateBrandDto], params: [IdentifierDto] }),

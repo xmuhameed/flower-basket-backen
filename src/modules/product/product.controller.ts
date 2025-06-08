@@ -125,15 +125,16 @@ export const getAllProducts = async (req: Request, res: Response, next: NextFunc
 
 export const getProductById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { id } = req.params as any as IdentifierDto;
+		const { id } = req.params as unknown as IdentifierDto;
 		const product = await prisma.product.findUnique({
-			where: { id: Number(id), deleted: false },
+			where: { id: id, deleted: false },
 			include: {
 				product_image: true,
 				category: true,
 				collection: true,
 				gift_for: true,
 				brand: true,
+				user_rate: true,				
 			},
 		});
 		if (!product) return next(new Error('Product not found'));
@@ -145,7 +146,7 @@ export const getProductById = async (req: Request, res: Response, next: NextFunc
 
 export const updateProduct = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { id } = req.params as any as IdentifierDto;
+		const { id } = req.params as unknown as IdentifierDto;
 		const dto = req.body as UpdateProductDto;
 
 		if (dto.category_id) {
@@ -182,7 +183,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 			...(dto.gift_for_id && { gift_for: { connect: { id: dto.gift_for_id } } }),
 			...(dto.brand_id && { brand: { connect: { id: dto.brand_id } } }),
 		};
-		const product = await prisma.product.update({ where: { id: Number(id) }, data: productData });
+		const product = await prisma.product.update({ where: { id: id }, data: productData });
 		// Handle deleted_images
 		if (dto.deleted_images && dto.deleted_images.length > 0) {
 			for (const imageUrl of dto.deleted_images) {
@@ -227,8 +228,8 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 
 export const deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { id } = req.params as any as IdentifierDto;
-		await prisma.product.update({ where: { id: Number(id) }, data: { deleted: true } });
+		const { id } = req.params as unknown as IdentifierDto;
+		await prisma.product.update({ where: { id: id }, data: { deleted: true } });
 		res.status(200).json({ success: true, message: 'Product deleted successfully' });
 	} catch (err) {
 		next(err);

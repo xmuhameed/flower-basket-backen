@@ -10,6 +10,15 @@ import { UserType } from '../auth/dto';
 
 const router = express.Router();
 
+router
+	.route('/')
+	.get(
+		validationMiddleware({ query: [GetAllGiftForDto, GlobalPaginationDto, GlobalSearchDto] }),
+		giftForController.getAllGiftFor,
+	);
+
+router.route('/:id').get(validationMiddleware({ params: [IdentifierDto] }), giftForController.getGiftForById);
+
 router.use(protect);
 
 router
@@ -18,20 +27,10 @@ router
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [CreateGiftForDto] }),
 		giftForController.createGiftFor,
-	)
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ query: [GetAllGiftForDto, GlobalPaginationDto, GlobalSearchDto] }),
-		giftForController.getAllGiftFor,
 	);
 
 router
 	.route('/:id')
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ params: [IdentifierDto] }),
-		giftForController.getGiftForById,
-	)
 	.put(
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [UpdateGiftForDto], params: [IdentifierDto] }),

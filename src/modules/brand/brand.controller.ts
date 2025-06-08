@@ -60,6 +60,34 @@ export const getBrandById = async (req: Request, res: Response, next: NextFuncti
 		const dto = req.params as any as IdentifierDto;
 		const brand = await prisma.brand.findUnique({
 			where: { id: dto.id, deleted: false },
+			select: {
+				id: true,
+				qrcode: true,
+				name: true,
+				brand_image_url: true,
+				createdAt: true,
+				updatedAt: true,
+				product: {
+					select: {
+						id: true,
+						name: true,
+						price: true,
+						currency: true,
+						description: true,
+						how_to_care: true,
+						content: true,
+						alert: true,
+						dimensions: true,
+						category: { select: { id: true, name: true } },
+						collection: { select: { id: true, name: true } },
+						gift_for: { select: { id: true, name: true } },
+						brand: { select: { id: true, name: true } },
+						product_image: true,
+						createdAt: true,
+						updatedAt: true,
+					},
+				},
+			},
 		});
 		if (!brand) {
 			return next(new Error('Brand not found'));

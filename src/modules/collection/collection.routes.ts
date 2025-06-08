@@ -10,6 +10,15 @@ import { UserType } from '../auth/dto';
 
 const router = express.Router();
 
+router
+	.route('/')
+	.get(
+		validationMiddleware({ query: [GetAllCollectionsDto, GlobalPaginationDto, GlobalSearchDto] }),
+		collectionController.getAllCollections,
+	);
+
+router.route('/:id').get(validationMiddleware({ params: [IdentifierDto] }), collectionController.getCollectionById);
+
 router.use(protect);
 
 router
@@ -18,20 +27,10 @@ router
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [CreateCollectionDto] }),
 		collectionController.createCollection,
-	)
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ query: [GetAllCollectionsDto, GlobalPaginationDto, GlobalSearchDto] }),
-		collectionController.getAllCollections,
 	);
 
 router
 	.route('/:id')
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ params: [IdentifierDto] }),
-		collectionController.getCollectionById,
-	)
 	.put(
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [UpdateCollectionDto], params: [IdentifierDto] }),

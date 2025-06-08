@@ -10,6 +10,15 @@ import { UserType } from '../auth/dto';
 
 const router = express.Router();
 
+router
+	.route('/')
+	.get(
+		validationMiddleware({ query: [GetAllCategoriesDto, GlobalPaginationDto, GlobalSearchDto] }),
+		categoryController.getAllCategories,
+	);
+
+router.route('/:id').get(validationMiddleware({ params: [IdentifierDto] }), categoryController.getCategoryById);
+
 router.use(protect);
 
 router
@@ -18,20 +27,10 @@ router
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [CreateCategoryDto] }),
 		categoryController.createCategory,
-	)
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ query: [GetAllCategoriesDto, GlobalPaginationDto, GlobalSearchDto] }),
-		categoryController.getAllCategories,
 	);
 
 router
 	.route('/:id')
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ params: [IdentifierDto] }),
-		categoryController.getCategoryById,
-	)
 	.put(
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [UpdateCategoryDto], params: [IdentifierDto] }),

@@ -10,6 +10,15 @@ import { UserType } from '../auth/dto';
 
 const router = express.Router();
 
+router
+	.route('/')
+	.get(
+		validationMiddleware({ query: [GetAllHomeSlidersDto, GlobalPaginationDto, GlobalSearchDto] }),
+		homeSliderController.getAllHomeSliders,
+	);
+
+router.route('/:id').get(validationMiddleware({ params: [IdentifierDto] }), homeSliderController.getHomeSliderById);
+
 router.use(protect);
 
 router
@@ -18,20 +27,10 @@ router
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [CreateHomeSliderDto] }),
 		homeSliderController.createHomeSlider,
-	)
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ query: [GetAllHomeSlidersDto, GlobalPaginationDto, GlobalSearchDto] }),
-		homeSliderController.getAllHomeSliders,
 	);
 
 router
 	.route('/:id')
-	.get(
-		restrictTo(UserType.ADMIN, UserType.USER),
-		validationMiddleware({ params: [IdentifierDto] }),
-		homeSliderController.getHomeSliderById,
-	)
 	.put(
 		restrictTo(UserType.ADMIN),
 		validationMiddleware({ body: [UpdateHomeSliderDto], params: [IdentifierDto] }),
