@@ -36,8 +36,6 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 		const address = await prisma.address.findUnique({ where: { id: dto.address_id } });
 		if (!address) return next(new Error('Address not found'));
 
-
-
 		const orderData: Prisma.orderCreateManyArgs['data'] = {
 			user_id: user.id,
 			address_id: address.id,
@@ -66,6 +64,9 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 		}
 
 		const orderItems = await prisma.order_item.createMany({ data: orderItemsData });
+
+		await prisma.cart.updateMany({ where: { user_id: dto.cart_user_id }, data: { deleted: true } });
+
 		res.status(201).json({ success: true, data: orderItems });
 	} catch (err) {
 		next(err);
@@ -113,51 +114,51 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 					},
 				},
 				{
-						address: {
-							recipient_name: {
-								contains: search.search,
-							},
-						},
-				},
-				{
-						address: {
-							recipient_phone: {
-								contains: search.search,
-							},
-						},
-				},
-				{
-						address: {
-							address: {
-								contains: search.search,
-							},
-						},
-				},
-				{
-						address: {
-							city: {
-								contains: search.search,
-							},
-						},
-				},
-				{
-						address: {
-							zip_code: {
-								contains: search.search,
-							},
-						},
-				},
-				{
-						address: {
-							address_details: {
-								contains: search.search,
-							},
-						},
-				},
-				{
-						status: {
+					address: {
+						recipient_name: {
 							contains: search.search,
 						},
+					},
+				},
+				{
+					address: {
+						recipient_phone: {
+							contains: search.search,
+						},
+					},
+				},
+				{
+					address: {
+						address: {
+							contains: search.search,
+						},
+					},
+				},
+				{
+					address: {
+						city: {
+							contains: search.search,
+						},
+					},
+				},
+				{
+					address: {
+						zip_code: {
+							contains: search.search,
+						},
+					},
+				},
+				{
+					address: {
+						address_details: {
+							contains: search.search,
+						},
+					},
+				},
+				{
+					status: {
+						contains: search.search,
+					},
 				},
 				{
 					user: {
@@ -187,13 +188,13 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 			where,
 			select: {
 				id: true,
+				user_id: true,
+				user: true,
 				address_id: true,
-				address:true,
-				user_id:true,
-				user:true,
-				createdAt:true,
-				updatedAt:true,
-				status:true,
+				address: true,
+				status: true,
+				createdAt: true,
+				updatedAt: true,
 				order_item: {
 					select: {
 						id: true,

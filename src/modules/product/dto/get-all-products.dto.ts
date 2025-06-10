@@ -32,6 +32,11 @@ export class GetAllProductsDto {
 	@IsInt()
 	brand_id?: number;
 
+	@Transform(({ value }) => parseInt(value))
+	@IsOptional()
+	@IsInt()
+	product_type_id?: number;
+
 	@IsOptional()
 	@IsEnum(ProductSortField)
 	sort_by?: ProductSortField;

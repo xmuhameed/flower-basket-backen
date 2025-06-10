@@ -36,6 +36,11 @@ export class UpdateProductDto {
 	@IsInt()
 	brand_id?: number;
 
+	@Transform(({ value }) => parseInt(value))
+	@IsOptional()
+	@IsInt()
+	product_type_id?: number;
+
 	@IsOptional()
 	@IsArray()
 	deleted_images?: string[];

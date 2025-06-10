@@ -19,6 +19,12 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
 				return next(new Error('Category not found'));
 			}
 		}
+		if (dto.product_type_id) {
+			const product_type = await prisma.product_type.findUnique({ where: { id: dto.product_type_id } });
+			if (!product_type) {
+				return next(new Error('Product type not found'));
+			}
+		}
 		if (dto.collection_id) {
 			const collection = await prisma.collection.findUnique({ where: { id: dto.collection_id } });
 			if (!collection) {
@@ -46,6 +52,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
 			collection: dto.collection_id ? { connect: { id: dto.collection_id } } : undefined,
 			gift_for: dto.gift_for_id ? { connect: { id: dto.gift_for_id } } : undefined,
 			brand: dto.brand_id ? { connect: { id: dto.brand_id } } : undefined,
+			product_type: dto.product_type_id ? { connect: { id: dto.product_type_id } } : undefined,
 		};
 		const product = await prisma.product.create({ data: productData });
 		// Handle images
@@ -89,6 +96,7 @@ export const getAllProducts = async (req: Request, res: Response, next: NextFunc
 			...(dto.collection_id && { collection_id: dto.collection_id }),
 			...(dto.gift_for_id && { gift_for_id: dto.gift_for_id }),
 			...(dto.brand_id && { brand_id: dto.brand_id }),
+			...(dto.product_type_id && { product_type_id: dto.product_type_id }),
 		};
 		if (search.search) {
 			whereObj.name = { contains: search.search };
@@ -134,7 +142,8 @@ export const getProductById = async (req: Request, res: Response, next: NextFunc
 				collection: true,
 				gift_for: true,
 				brand: true,
-				user_rate: true,				
+				product_type: true,
+				user_rate: true,
 			},
 		});
 		if (!product) return next(new Error('Product not found'));
@@ -153,6 +162,12 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 			const category = await prisma.category.findUnique({ where: { id: dto.category_id } });
 			if (!category) {
 				return next(new Error('Category not found'));
+			}
+		}
+		if (dto.product_type_id) {
+			const product_type = await prisma.product_type.findUnique({ where: { id: dto.product_type_id } });
+			if (!product_type) {
+				return next(new Error('Product type not found'));
 			}
 		}
 		if (dto.collection_id) {
@@ -182,6 +197,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 			...(dto.collection_id && { collection: { connect: { id: dto.collection_id } } }),
 			...(dto.gift_for_id && { gift_for: { connect: { id: dto.gift_for_id } } }),
 			...(dto.brand_id && { brand: { connect: { id: dto.brand_id } } }),
+			...(dto.product_type_id && { product_type: { connect: { id: dto.product_type_id } } }),
 		};
 		const product = await prisma.product.update({ where: { id: id }, data: productData });
 		// Handle deleted_images

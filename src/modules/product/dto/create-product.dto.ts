@@ -32,8 +32,13 @@ export class CreateProductDto {
 	@IsOptional()
 	@IsInt()
 	brand_id?: number;
+	
+	@Transform(({ value }) => parseInt(value))
+	@IsOptional()
+	@IsInt()
+	product_type_id?: number;
 
 	@IsOptional()
 	@IsArray()
-	product_images?: any[]; // Will be handled by file upload
+	product_images?: any[];
 }
