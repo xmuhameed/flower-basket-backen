@@ -1,4 +1,4 @@
-import { user } from './../../../node_modules/.prisma/client/index.d';
+import { user, cart } from './../../../node_modules/.prisma/client/index.d';
 import { Request, Response, NextFunction } from 'express';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -18,7 +18,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 
 		if (dto.cart_user_id && dto.product_id) return next(new Error('You can only order one of cart or product'));
 
-		let cart;
+		let cart: any;
 		if (dto.cart_user_id) {
 			cart = await prisma.cart.findMany({
 				where: { user_id: dto.cart_user_id, deleted: false },
@@ -27,7 +27,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 			if (!cart || cart.length === 0) return next(new Error('Cart not found'));
 		}
 
-		let product;
+		let product: any;
 		if (dto.product_id) {
 			product = await prisma.product.findUnique({ where: { id: dto.product_id } });
 			if (!product) return next(new Error('Product not found'));
@@ -36,33 +36,37 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 		const address = await prisma.address.findUnique({ where: { id: dto.address_id } });
 		if (!address) return next(new Error('Address not found'));
 
-		const uniqueOrderSerial = await nanoid(10);
-		const ordersData: Prisma.orderCreateManyInput[] = [];
+
+
+		const orderData: Prisma.orderCreateManyArgs['data'] = {
+			user_id: user.id,
+			address_id: address.id,
+		};
+
+		const order = await prisma.order.create({ data: orderData });
+
+		const orderItemsData: Prisma.order_itemCreateManyInput[] = [];
 
 		if (cart) {
 			for (const item of cart) {
-				ordersData.push({
-					user_id: user.id,
+				orderItemsData.push({
+					order_id: order.id,
 					product_id: item.product_id,
 					quantity: item.quantity,
-					address_id: address.id,
-					order_serial: uniqueOrderSerial,
 				});
 			}
 		}
 
 		if (product) {
-			ordersData.push({
-				user_id: user.id,
+			orderItemsData.push({
+				order_id: order.id,
 				product_id: product.id,
 				quantity: dto.quantity,
-				address_id: address.id,
-				order_serial: uniqueOrderSerial,
 			});
 		}
 
-		const order = await prisma.order.createMany({ data: ordersData });
-		res.status(201).json({ success: true, data: order });
+		const orderItems = await prisma.order_item.createMany({ data: orderItemsData });
+		res.status(201).json({ success: true, data: orderItems });
 	} catch (err) {
 		next(err);
 	}
@@ -100,68 +104,107 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 		if (search.search) {
 			where.OR = [
 				{
-					order_serial: {
-						contains: search.search,
-					},
-				},
-				{
-					product: {
-						name: {
-							contains: search.search,
+					order_item: {
+						product: {
+							name: {
+								contains: search.search,
+							},
 						},
 					},
 				},
 				{
-					address: {
-						recipient_name: {
-							contains: search.search,
-						},
-					},
-				},
-				{
-					address: {
-						recipient_phone: {
-							contains: search.search,
-						},
-					},
-				},
-				{
-					address: {
 						address: {
+							recipient_name: {
+								contains: search.search,
+							},
+						},
+				},
+				{
+						address: {
+							recipient_phone: {
+								contains: search.search,
+							},
+						},
+				},
+				{
+						address: {
+							address: {
+								contains: search.search,
+							},
+						},
+				},
+				{
+						address: {
+							city: {
+								contains: search.search,
+							},
+						},
+				},
+				{
+						address: {
+							zip_code: {
+								contains: search.search,
+							},
+						},
+				},
+				{
+						address: {
+							address_details: {
+								contains: search.search,
+							},
+						},
+				},
+				{
+						status: {
+							contains: search.search,
+						},
+				},
+				{
+					user: {
+						email: {
 							contains: search.search,
 						},
 					},
 				},
 				{
-					address: {
-						city: {
+					user: {
+						fullname: {
 							contains: search.search,
 						},
 					},
 				},
 				{
-					address: {
-						zip_code: {
+					user: {
+						phone: {
 							contains: search.search,
 						},
-					},
-				},
-				{
-					address: {
-						address_details: {
-							contains: search.search,
-						},
-					},
-				},
-				{
-					status: {
-						contains: search.search,
 					},
 				},
 			];
 		}
 
-		const orders = await prisma.order.findMany({ where, ...checkPagination(pagination) });
+		const orders = await prisma.order.findMany({
+			where,
+			select: {
+				id: true,
+				address_id: true,
+				address:true,
+				user_id:true,
+				user:true,
+				createdAt:true,
+				updatedAt:true,
+				status:true,
+				order_item: {
+					select: {
+						id: true,
+						product: true,
+						product_id: true,
+						quantity: true,
+					},
+				},
+			},
+			...checkPagination(pagination),
+		});
 		const total = await prisma.order.count({ where });
 
 		res.status(200).json({ success: true, count: total, data: orders });
@@ -176,19 +219,21 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
 		const params = req.params as unknown as IdentifierDto;
 
 		const order = await prisma.order.findUnique({
-			where: { id: params.id, deleted: false },
+			where: { id: params.id },
 			select: {
-				user: true,
+				id: true,
 				user_id: true,
-				product: true,
-				product_id: true,
-				address: true,
+				user: true,
 				address_id: true,
-				quantity: true,
+				address: true,
 				status: true,
-				order_serial: true,
-				createdAt: true,
-				updatedAt: true,
+				order_item: {
+					select: {
+						product: true,
+						product_id: true,
+						quantity: true,
+					},
+				},
 			},
 		});
 

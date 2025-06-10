@@ -1,0 +1,134 @@
+{
+    "name": "Product Type",
+    "item": [
+        {
+            "name": "Get All Product Types",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/product-type?page=1&limit=10&search=",
+                    "host": ["{{base_url}}"],
+                    "path": ["product-type"],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "10"
+                        },
+                        {
+                            "key": "search",
+                            "value": ""
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Create Product Type",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}"
+                    }
+                ],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "name",
+                            "value": "Test Product Type",
+                            "type": "text"
+                        },
+                        {
+                            "key": "sort",
+                            "value": "1",
+                            "type": "text"
+                        },
+                        {
+                            "key": "product_type_image",
+                            "type": "file",
+                            "src": "/path/to/image.jpg"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/product-type",
+                    "host": ["{{base_url}}"],
+                    "path": ["product-type"]
+                }
+            }
+        },
+        {
+            "name": "Update Product Type",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}"
+                    }
+                ],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "name",
+                            "value": "Updated Product Type",
+                            "type": "text"
+                        },
+                        {
+                            "key": "sort",
+                            "value": "2",
+                            "type": "text"
+                        },
+                        {
+                            "key": "product_type_image",
+                            "type": "file",
+                            "src": "/path/to/image.jpg"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/product-type/:id",
+                    "host": ["{{base_url}}"],
+                    "path": ["product-type", ":id"],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": "1"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Delete Product Type",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/product-type/:id",
+                    "host": ["{{base_url}}"],
+                    "path": ["product-type", ":id"],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": "1"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+} 

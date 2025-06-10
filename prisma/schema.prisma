@@ -63,7 +63,7 @@ model user {
     user_rates user_rate[]
     favorites favorite[]
     carts cart[]
-    orders order[]
+    order order[]
 }
 
 model address {
@@ -86,7 +86,7 @@ model address {
     updatedAt DateTime @default(now()) @updatedAt
 
     deleted Boolean @default(false)
-    order   order[]
+    order order[]
 
     @@index([deleted])
 }
@@ -235,7 +235,7 @@ model product {
 
     user_rate     user_rate[]
     cart          cart[]
-    order         order[]
+    order_item    order_item[]
     favorite      favorite[]
     product_image product_image[]
 
@@ -317,23 +317,35 @@ model cart {
 
 model order {
     id Int @id @default(autoincrement())
-    order_serial String @unique
 
     user_id Int
     user    user @relation(fields: [user_id], references: [id])
 
-    product_id Int
-    product    product @relation(fields: [product_id], references: [id])
-
     address_id Int
     address    address @relation(fields: [address_id], references: [id])
 
-    quantity Int
-
     status order_status @default(pending)
+
+    order_item order_item[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
+
+    deleted Boolean @default(false)
+
+    @@index([deleted])
+}
+model order_item {
+    id Int @id @default(autoincrement())
+
+    order_id Int
+    order    order @relation(fields: [order_id], references: [id])
+
+    product_id Int
+    product    product @relation(fields: [product_id], references: [id])
+
+    quantity Int
+
 
     deleted Boolean @default(false)
 

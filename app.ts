@@ -27,6 +27,7 @@ import { userRateRoutes } from './src/modules/user_rate/user_rate.routes';
 import { favoriteRoutes } from './src/modules/favorite/favorite.routes';
 import { cartRoutes } from './src/modules/cart/cart.routes';
 import { userRoutes } from './src/modules/users/users.routes';
+import { productTypeRoutes } from './src/modules/product_type/product_type.routes';
 
 const app = express();
 
@@ -86,6 +87,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/user-rates', userRateRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/carts', cartRoutes);
+app.use('/api/product-types', productTypeRoutes);
 
 // Unhandled Routes
 app.all('*', (req: Request, res: Response, next: NextFunction) => {

@@ -8,7 +8,8 @@
 		"pre-w": "prettier --write .",
 		"start": "ts-node server.ts",
 		"dev": "nodemon server.ts",
-		"start:prod": "NODE_ENV=production nodemon server.ts"
+		"start:prod": "NODE_ENV=production nodemon server.ts",
+		"studio": "prisma studio"
 	},
 	"keywords": [],
 	"author": "",
