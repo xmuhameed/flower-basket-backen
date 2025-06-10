@@ -16,6 +16,7 @@ export const createAddress = async (req: Request, res: Response, next: NextFunct
 			return next(new Error('User not found'));
 		}
 
+
 		const addressData: Prisma.addressCreateManyArgs['data'] = {
 			user_id: dto.user_id,
 			address: dto.address,
@@ -26,6 +27,7 @@ export const createAddress = async (req: Request, res: Response, next: NextFunct
 			recipient_name: dto.recipient_name,
 			recipient_phone: dto.recipient_phone,
 			location_url: dto.location_url,
+			shipping_fee: 5,
 		};
 
 		const address = await prisma.address.create({

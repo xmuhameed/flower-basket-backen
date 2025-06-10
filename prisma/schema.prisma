@@ -82,6 +82,8 @@ model address {
     address_details String?
     zip_code        String?
 
+    shipping_fee Int @default(0)
+
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
 
@@ -325,6 +327,9 @@ model order {
     address    address @relation(fields: [address_id], references: [id])
 
     status order_status @default(pending)
+
+    products_price Int @default(0)
+    total_price Int @default(0)
 
     order_item order_item[]
 

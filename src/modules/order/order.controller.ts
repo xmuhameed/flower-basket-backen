@@ -63,7 +63,35 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 
 		const orderItems = await prisma.order_item.createMany({ data: orderItemsData });
 
-		await prisma.cart.updateMany({ where: { user_id: dto.cart_user_id }, data: { deleted: true } });
+		// Get the created order items with product details to calculate total price
+		const createdOrderItems = await prisma.order_item.findMany({
+			where: { order_id: order.id },
+			select: {
+				product: {
+					select: {
+						price: true,
+					},
+				},
+				quantity: true,
+			},
+		});
+
+		const productsPrice = createdOrderItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+
+		if (dto.cart_user_id) {
+			await prisma.cart.updateMany({
+				where: { user_id: dto.cart_user_id },
+				data: { deleted: true },
+			});
+		}
+
+		await prisma.order.update({
+			where: { id: order.id },
+			data: {
+				products_price: productsPrice,
+				total_price: productsPrice + address.shipping_fee,
+			},
+		});
 
 		res.status(201).json({ success: true, data: orderItems });
 	} catch (err) {
@@ -97,7 +125,6 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 			where.address_id = address.id;
 		}
 		if (dto.status) where.status = dto.status;
-
 
 		if (search.search) {
 			where.OR = [
@@ -182,9 +209,16 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 			where,
 			select: {
 				id: true,
-				user_id: true,
-				user: true,
-				address_id: true,
+				products_price: true,
+				total_price: true,
+				user: {
+					select: {
+						id: true,
+						fullname: true,
+						email: true,
+						phone: true,
+					},
+				},
 				address: true,
 				status: true,
 				createdAt: true,
@@ -192,9 +226,19 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 				order_item: {
 					select: {
 						id: true,
-						product: true,
-						product_id: true,
 						quantity: true,
+						product: {
+							select: {
+								id: true,
+								name: true,
+								price: true,
+								product_image: {
+									select: {
+										image_url: true,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
