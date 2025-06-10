@@ -1,12 +1,10 @@
-import { user, cart } from './../../../node_modules/.prisma/client/index.d';
 import { Request, Response, NextFunction } from 'express';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { order_status, Prisma, PrismaClient } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { GetAllOrdersDto } from './dto/get-all-orders.dto';
 import { checkPagination, GlobalPaginationDto, GlobalSearchDto, IdentifierDto } from '../../shared/global-dto';
 import { UserType } from '../auth/dto';
-import { nanoid } from 'nanoid/async';
 
 const prisma = new PrismaClient();
 
@@ -100,15 +98,16 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 		}
 		if (dto.status) where.status = dto.status;
 
-		if (dto.order_serial) where.order_serial = dto.order_serial;
 
 		if (search.search) {
 			where.OR = [
 				{
 					order_item: {
-						product: {
-							name: {
-								contains: search.search,
+						some: {
+							product: {
+								name: {
+									contains: search.search,
+								},
 							},
 						},
 					},
@@ -153,11 +152,6 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 						address_details: {
 							contains: search.search,
 						},
-					},
-				},
-				{
-					status: {
-						contains: search.search,
 					},
 				},
 				{
