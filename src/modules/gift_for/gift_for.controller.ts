@@ -15,6 +15,7 @@ export const createGiftFor = async (req: Request, res: Response, next: NextFunct
 		const uniqueGiftForCode = await nanoid(10);
 		const giftForData: Prisma.gift_forCreateInput = {
 			name: dto.name,
+			name_ar: dto.name_ar,
 			sort: dto.sort,
 			qrcode: uniqueGiftForCode,
 		};
@@ -42,7 +43,7 @@ export const getAllGiftFor = async (req: Request, res: Response, next: NextFunct
 			deleted: false,
 		};
 		if (search.search) {
-			whereObj.OR = [{ name: { contains: search.search } }];
+			whereObj.OR = [{ name: { contains: search.search } }, { name_ar: { contains: search.search } }];
 		}
 		const giftFors = await prisma.gift_for.findMany({
 			where: whereObj,
@@ -65,32 +66,61 @@ export const getGiftForById = async (req: Request, res: Response, next: NextFunc
 				id: true,
 				qrcode: true,
 				name: true,
+				name_ar: true,
 				sort: true,
 				gift_for_image_url: true,
 				createdAt: true,
 				updatedAt: true,
-				product: {
+				// product: {
+				// 	select: {
+				// 		id: true,
+				// 		name: true,
+				// 		price: true,
+				// 		currency: true,
+				// 		description: true,
+				// 		how_to_care: true,
+				// 		content: true,
+				// 		alert: true,
+				// 		dimensions: true,
+				// 		category: { select: { id: true, name: true } },
+				// 		collection: { select: { id: true, name: true } },
+				// 		gift_for: { select: { id: true, name: true } },
+				// 		brand: { select: { id: true, name: true } },
+				// 		product_image: true,
+				// 		createdAt: true,
+				// 		updatedAt: true,
+				// 	}
+				// }
+				product_gift_for_relation: {
 					select: {
 						id: true,
-						name: true,
-						price: true,
-						currency: true,
-						description: true,
-						how_to_care: true,
-						content: true,
-						alert: true,
-						dimensions: true,
-						category: { select: { id: true, name: true } },
-						collection: { select: { id: true, name: true } },
-						gift_for: { select: { id: true, name: true } },
-						brand: { select: { id: true, name: true } },
-						product_image: true,
-						createdAt: true,
-						updatedAt: true,
-					}
-				}
-			}
+						product: {
+							select: {
+								id: true,
+								name: true,
+								price: true,
+								currency: true,
+								description: true,
+								how_to_care: true,
+								content: true,
+								alert: true,
+								dimensions: true,
+								// category: { select: { id: true, name: true } },
+								product_category_relation: {
+									select: { id: true, category: { select: { id: true, name: true, name_ar: true } } },
+								},
+								collection: { select: { id: true, name: true, name_ar: true } },
+								brand: { select: { id: true, name: true, name_ar: true } },
+								product_image: true,
+								createdAt: true,
+								updatedAt: true,
+							},
+						},
+					},
+				},
+			},
 		});
+
 		if (!giftFor) {
 			return next(new Error('GiftFor not found'));
 		}
@@ -112,6 +142,7 @@ export const updateGiftFor = async (req: Request, res: Response, next: NextFunct
 		}
 		const giftForData: Prisma.gift_forUpdateInput = {
 			...(dto.name && { name: dto.name }),
+			...(dto.name_ar && { name_ar: dto.name_ar }),
 			...(dto.sort && { sort: dto.sort }),
 		};
 		const nestedFolder = `gift_for/gift_for-${giftFor.qrcode}`;

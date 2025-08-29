@@ -16,6 +16,7 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
 		const uniqueCategoryCode = await nanoid(10);
 		const categoryData: Prisma.categoryCreateInput = {
 			name: dto.name,
+			name_ar: dto.name_ar,
 			sort: dto.sort,
 			qrcode: uniqueCategoryCode,
 		};
@@ -52,6 +53,9 @@ export const getAllCategories = async (req: Request, res: Response, next: NextFu
 					name: {
 						contains: search.search,
 					},
+					name_ar: {
+						contains: search.search,
+					},
 				},
 			];
 		}
@@ -76,32 +80,58 @@ export const getCategoryById = async (req: Request, res: Response, next: NextFun
 			select: {
 				id: true,
 				name: true,
+				name_ar: true,
 				sort: true,
 				qrcode: true,
 				category_image_url: true,
 				createdAt: true,
 				updatedAt: true,
-				product: {
+				// product: {
+				// 	select: {
+				// 		id: true,
+				// 		name: true,
+				// 		price: true,
+				// 		currency: true,
+				// 		description: true,
+				// 		how_to_care: true,
+				// 		content: true,
+				// 		alert: true,
+				// 		dimensions: true,
+				// 		category: { select: { id: true, name: true } },
+				// 		collection: { select: { id: true, name: true } },
+				// 		gift_for: { select: { id: true, name: true } },
+				// 		brand: { select: { id: true, name: true } },
+				// 		product_image: true,
+				// 		createdAt: true,
+				// 		updatedAt: true,
+				// 	}
+				// }
+				product_category_relation: {
 					select: {
 						id: true,
-						name: true,
-						price: true,
-						currency: true,
-						description: true,
-						how_to_care: true,
-						content: true,
-						alert: true,
-						dimensions: true,
-						category: { select: { id: true, name: true } },
-						collection: { select: { id: true, name: true } },
-						gift_for: { select: { id: true, name: true } },
-						brand: { select: { id: true, name: true } },
-						product_image: true,
-						createdAt: true,
-						updatedAt: true,
-					}
-				}
-			}
+						product: {
+							select: {
+								id: true,
+								name: true,
+								name_ar: true,
+								price: true,
+								currency: true,
+								description: true,
+								how_to_care: true,
+								content: true,
+								alert: true,
+								dimensions: true,
+								product_gift_for_relation: { select: { id: true, gift_for: { select: { id: true, name: true, name_ar: true } } } },
+								collection: { select: { id: true, name: true, name_ar: true } },
+								brand: { select: { id: true, name: true, name_ar: true } },
+								product_image: true,
+								createdAt: true,
+								updatedAt: true,
+							},
+						},
+					},
+				},
+			},
 		});
 		if (!category) {
 			return next(new Error('Category not found'));
@@ -124,6 +154,7 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
 		}
 		const categoryData: Prisma.categoryUpdateInput = {
 			...(dto.name && { name: dto.name }),
+			...(dto.name_ar && { name_ar: dto.name_ar }),
 			...(dto.sort && { sort: dto.sort }),
 		};
 

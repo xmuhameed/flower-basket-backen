@@ -1,95 +1,125 @@
 import { Request, Response, NextFunction } from 'express';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
-import { GetAllCartsDto } from './dto/get-all-carts.dto';
-import { checkPagination, GlobalPaginationDto, IdentifierDto } from '../../shared/global-dto';
+import { IdentifierDto, IdentifiersDto } from '../../shared/global-dto';
+import { UpdateCartItemDto } from './dto/update-cart.dto';
 
 const prisma = new PrismaClient();
 
-export const createCart = async (req: Request, res: Response, next: NextFunction) => {
+const cartSelect = {
+	id: true,
+	quantity: true,
+	product: {
+		select: {
+			id: true,
+			name: true,
+		},
+	},
+}
+
+export const getUserCart = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const where: any = { deleted: false, user_id: req.user.id };
+
+		const carts = await prisma.cart.findMany({
+			where,
+			select: cartSelect,
+		});
+		res.status(200).json({ success: true, data: carts });
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const addToCart = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const dto = req.body as CreateCartDto;
-		const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-		if (!user) return next(new Error('User not found'));
+		let quantities = [...dto.quantities];
+		let productIds = [...dto.product_ids];
 
-		const product = await prisma.product.findUnique({ where: { id: dto.product_id } });
-		if (!product) return next(new Error('Product not found'));
+		if (quantities.length !== productIds.length)
+			return next(new Error('Quantities and product ids must be of the same length'));
 
-		// Only one cart entry per user/product
-		const exists = await prisma.cart.findFirst({
-			where: { user_id: user.id, product_id: product.id, deleted: false },
+		const products = await prisma.product.findMany({ where: { id: { in: productIds }, deleted: false } });
+		if (products.length !== productIds.length) return next(new Error('Some products not found'));
+
+		const existingCartItems = await prisma.cart.findMany({
+			where: { user_id: req.user.id, deleted: false },
 		});
-		if (exists) return next(new Error('Product already in cart, if you want to update quantity, use update cart'));
 
-		const cartData: Prisma.cartCreateManyArgs['data'] = {
-			user_id: user.id,
-			product_id: product.id,
-			quantity: dto.quantity,
-		};
+		if (existingCartItems.length > 0) {
+			existingCartItems.forEach(async (cart) => {
+				if (productIds.includes(cart.product_id)) {
+					const productIndex = productIds.indexOf(cart.product_id);
+					const newQuantity = cart.quantity + quantities[productIndex];
+					productIds.splice(productIndex, 1);
+					quantities.splice(productIndex, 1);
+					await prisma.cart.update({
+						where: { id: cart.id },
+						data: { quantity: newQuantity },
+					});
+				}
+			});
+		}
 
-		const cart = await prisma.cart.create({ data: cartData });
-		res.status(201).json({ success: true, data: cart });
+		const cartData: Prisma.cartCreateManyArgs['data'] = [];
+		productIds.forEach((productId, index) => {
+				cartData.push({
+					user_id: req.user.id,
+					product_id: productId,
+					quantity: quantities[index],
+				});
+		});
+
+		const addedCarts = await prisma.cart.createMany({ data: cartData });
+		if (addedCarts.count !== cartData.length) return next(new Error('Failed to add products to cart'));
+
+		const userCart = await prisma.cart.findMany({ where: { user_id: req.user.id, deleted: false }, select: cartSelect });
+		res.status(201).json({ success: true, data: userCart });
 	} catch (err) {
 		next(err);
 	}
 };
 
-export const getAllCarts = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const dto = req.query as GetAllCartsDto;
-		const pagination = req.query as GlobalPaginationDto;
-		const where: any = { deleted: false };
-		const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-		if (!user) return next(new Error('User not found'));
-
-		where.user_id = user.id;
-		if (dto.product_id) where.product_id = dto.product_id;
-
-		const carts = await prisma.cart.findMany({ where, ...checkPagination(pagination) });
-		const total = await prisma.cart.count({ where });
-		res.status(200).json({ success: true, count: total, data: carts });
-	} catch (err) {
-		next(err);
-	}
-};
-
-export const updateCart = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const params = req.params as unknown as IdentifierDto;
-		const dto = req.body as UpdateCartDto;
-		const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-		if (!user) return next(new Error('User not found'));
-
-		const cart = await prisma.cart.findUnique({ where: { id: params.id, user_id: user.id } });
-		if (!cart) return next(new Error('Cart not found'));
-
-		if (cart.user_id !== user.id) return next(new Error('You are not authorized to access this resource'));
-
-		const cartData: Prisma.cartUpdateInput = {
-			...(dto.quantity && { quantity: dto.quantity }),
-		};
-
-		const updatedCart = await prisma.cart.update({ where: { id: params.id }, data: cartData });
-		res.status(200).json({ success: true, data: updatedCart });
-	} catch (err) {
-		next(err);
-	}
-};
-
-export const deleteCart = async (req: Request, res: Response, next: NextFunction) => {
+export const updateCartItem = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const params = req.params as unknown as IdentifierDto;
-		const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-		if (!user) return next(new Error('User not found'));
+		const dto = req.body as UpdateCartItemDto;
 
-		const cart = await prisma.cart.findUnique({ where: { id: params.id, user_id: user.id } });
-		if (!cart) return next(new Error('Cart not found'));
+		const cartItem = await prisma.cart.findFirst({ where: { product_id: params.id, user_id: req.user.id, deleted: false } });
+		if (!cartItem) return next(new Error('Product not in cart'));
 
-		if (cart.user_id !== user.id) return next(new Error('You are not authorized to access this resource'));
+		await prisma.cart.update({ where: { id: cartItem.id }, data: { quantity: dto.quantity } });
 
-		await prisma.cart.update({ where: { id: params.id }, data: { deleted: true } });
-		res.status(200).json({ success: true, message: 'Cart deleted successfully' });
+		const userCart = await prisma.cart.findMany({ where: { user_id: req.user.id, deleted: false }, select: cartSelect });
+		res.status(200).json({ success: true, message: 'Cart item updated successfully', data: userCart });
+	} catch (err) {
+		next(err);
+	}
+};
+export const removeFromCart = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const params = req.params as unknown as IdentifiersDto;
+
+		const carts = await prisma.cart.findMany({
+			where: { product_id: { in: params.ids }, user_id: req.user.id, deleted: false },
+		});
+		if (carts.length !== params.ids.length) return next(new Error('Some cart items not found'));
+
+		await prisma.cart.updateMany({ where: { product_id: { in: params.ids }, user_id: req.user.id, deleted: false }, data: { deleted: true } });
+
+		const userCart = await prisma.cart.findMany({ where: { user_id: req.user.id, deleted: false }, select: cartSelect });
+		res.status(200).json({ success: true, message: 'Cart items deleted successfully', data: userCart });
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const clearCart = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		await prisma.cart.updateMany({ where: { user_id: req.user.id, deleted: false }, data: { deleted: true } });
+		const userCart = await prisma.cart.findMany({ where: { user_id: req.user.id, deleted: false }, select: cartSelect });
+		res.status(200).json({ success: true, message: 'Cart items cleared successfully', data: userCart });
 	} catch (err) {
 		next(err);
 	}

@@ -9,16 +9,18 @@
 		"start": "ts-node server.ts",
 		"dev": "nodemon server.ts",
 		"start:prod": "NODE_ENV=production nodemon server.ts",
-		"studio": "prisma studio"
+		"prisma": "prisma studio"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"type": "commonjs",
 	"dependencies": {
+		"@nestjs/mapped-types": "^2.1.0",
 		"@prisma/client": "^6.8.2",
 		"@types/bcryptjs": "^2.4.6",
 		"@types/jsonwebtoken": "^9.0.9",
+		"axios": "^1.9.0",
 		"bcryptjs": "^3.0.2",
 		"body-parser": "^2.2.0",
 		"class-transformer": "^0.5.1",

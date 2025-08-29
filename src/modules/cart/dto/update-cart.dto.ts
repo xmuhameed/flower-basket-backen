@@ -1,9 +1,8 @@
-import { IsOptional, IsInt } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsNumber, IsPositive } from "class-validator";
 
-export class UpdateCartDto {
-	@IsOptional()
-	@Transform(({ value }) => parseInt(value))
-	@IsInt()
-	quantity?: number;
+
+export class UpdateCartItemDto {
+	@IsNumber()
+	@IsPositive()
+	quantity: number;
 }

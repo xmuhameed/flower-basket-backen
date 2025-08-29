@@ -7,5 +7,9 @@ export class UpdateBrandDto {
 
 	@IsOptional()
 	@IsString()
+	name_ar?: string;
+
+	@IsOptional()
+	@IsString()
 	brand_image?: string;
 }

@@ -14,7 +14,7 @@ const comparePasswords = async (plainPassword: string, hashedPassword: string): 
 	return bcrypt.compare(plainPassword, hashedPassword);
 };
 export class AuthService {
-	private generateToken(userId: number, userType: UserType): string {
+	 generateToken(userId: number, userType: UserType): string {
 		return jwt.sign(
 			{
 				id: userId,
@@ -34,6 +34,19 @@ export class AuthService {
 			// Try to find user in each table
 			const adminData = await prisma.admin.findFirst({
 				where: { email: dto.email, deleted: false },
+				select: {
+					id: true,
+					fullname: true,
+					email: true,
+					phone: true,
+					qrcode: true,
+					profile_image_url: true,
+					gender: true,
+					birth_date: true,
+					createdAt: true,
+					updatedAt: true,
+					password: true,
+				},
 			});
 
 			if (adminData) {
@@ -42,6 +55,19 @@ export class AuthService {
 		} else {
 			const userData = await prisma.user.findFirst({
 				where: { email: dto.email, deleted: false },
+				select: {
+					id: true,
+					fullname: true,
+					email: true,
+					phone: true,
+					qrcode: true,
+					profile_image_url: true,
+					gender: true,
+					birth_date: true,
+					createdAt: true,
+					updatedAt: true,
+					password: true,
+				},
 			});
 
 			if (userData) {
@@ -63,13 +89,13 @@ export class AuthService {
 			dto.email.toLocaleLowerCase().includes('@admin.com') ? UserType.ADMIN : UserType.USER,
 		);
 
+		delete user.password;
+
 		return {
 			token,
-			user: {
-				id: user.id,
-				email: user.email,
-				fullname: user.fullname,
-				user_type: dto.email.toLocaleLowerCase().includes('@admin.com') ? UserType.ADMIN : UserType.USER,
+			data: {
+				...user,
+				type: dto.email.toLocaleLowerCase().includes('@admin.com') ? UserType.ADMIN : UserType.USER,
 			},
 		};
 	}
@@ -109,6 +135,40 @@ export class AuthService {
 				},
 			});
 		}
+		let userData;
+		if (dto.email.toLocaleLowerCase().includes('@admin.com')) {
+			userData = await prisma.admin.findUnique({
+				where: { id: user.id },
+				select: {
+					id: true,
+					fullname: true,
+					email: true,
+					phone: true,
+					qrcode: true,
+					profile_image_url: true,
+					gender: true,
+					birth_date: true,
+					createdAt: true,
+					updatedAt: true,
+				},
+			});
+		} else {
+			userData = await prisma.user.findUnique({
+				where: { id: user.id },
+				select: {
+					id: true,
+					fullname: true,
+					email: true,
+					phone: true,
+					qrcode: true,
+					profile_image_url: true,
+					gender: true,
+					birth_date: true,
+					createdAt: true,
+					updatedAt: true,
+				},
+			});
+		}
 
 		const token = this.generateToken(
 			user.id,
@@ -117,11 +177,9 @@ export class AuthService {
 
 		return {
 			token,
-			user: {
-				id: user.id,
-				email: user.email,
-				fullname: user.fullname,
-				user_type: dto.email.toLocaleLowerCase().includes('@admin.com') ? UserType.ADMIN : UserType.USER,
+			data: {
+				...userData,
+				type: dto.email.toLocaleLowerCase().includes('@admin.com') ? UserType.ADMIN : UserType.USER,
 			},
 		};
 	}

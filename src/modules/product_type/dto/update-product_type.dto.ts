@@ -6,6 +6,10 @@ export class UpdateProductTypeDto {
 	name?: string;
 
 	@IsOptional()
+	@IsString()
+	name_ar?: string;
+
+	@IsOptional()
 	@IsInt()
 	sort?: number;
 

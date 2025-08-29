@@ -24,7 +24,7 @@ export class QrCodeIdentifierDto {
 }
 
 export class IdentifiersDto {
-	@Transform(({ value }) => (typeof value === 'string' ? value.split(',').map((id: string) => parseInt(id)) : value))
+	@Transform(({ value }) => (typeof value === 'string' ? value.split(',').map((id: string) => +id) : value))
 	@IsNumber({}, { each: true })
 	@IsPositive({ each: true })
 	ids: number[];

@@ -13,6 +13,7 @@ export const createProductType = async (req: Request, res: Response, next: NextF
         const uniqueProductTypeCode = await nanoid(10);
         const productTypeData: Prisma.product_typeCreateInput = {
             name: dto.name,
+            name_ar: dto.name_ar,
             sort: dto.sort,
             qrcode: uniqueProductTypeCode,
         };
@@ -46,6 +47,9 @@ export const getAllProductTypes = async (req: Request, res: Response, next: Next
             whereObj.OR = [
                 {
                     name: {
+                        contains: search.search,
+                    },
+                    name_ar: {
                         contains: search.search,
                     },
                 },
@@ -92,6 +96,7 @@ export const updateProductType = async (req: Request, res: Response, next: NextF
 
         const productTypeData: Prisma.product_typeUpdateInput = {
             ...(dto.name && { name: dto.name }),
+            ...(dto.name_ar && { name_ar: dto.name_ar }),
             ...(dto.sort && { sort: dto.sort }),
         };
 

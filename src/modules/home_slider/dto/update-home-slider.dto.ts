@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { IsString, IsOptional, IsInt } from 'class-validator';
 
 export class UpdateHomeSliderDto {
@@ -5,6 +6,11 @@ export class UpdateHomeSliderDto {
 	@IsString()
 	name?: string;
 
+	@IsOptional()
+	@IsString()
+	name_ar?: string;
+
+	@Transform(({ value }) => parseInt(value))
 	@IsOptional()
 	@IsInt()
 	sort?: number;

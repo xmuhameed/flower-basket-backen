@@ -1,5 +1,6 @@
 import path from 'path';
 import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
@@ -31,6 +32,15 @@ import { productTypeRoutes } from './src/modules/product_type/product_type.route
 
 const app = express();
 
+// Enable CORS
+app.use(cors({
+	// origin: 'http://localhost:3000', // Your frontend URL
+	origin: '*',
+	credentials: true, // Allow credentials (cookies, authorization headers, etc)
+	methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+	allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(fileUpload());
 const httpServer = createServer(app);
 
@@ -51,7 +61,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Implement Rate Limiting
 const limiter = rateLimit({
-	max: 100,
+	max: 1000,
 	windowMs: 60 * 60 * 1000, // to limit the number of requests from the same IP in one hour
 	message: 'to many requests from this IP, Please try again in one hour!',
 });

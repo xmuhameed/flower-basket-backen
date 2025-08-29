@@ -6,6 +6,10 @@ export class UpdateCollectionDto {
 	name?: string;
 
 	@IsOptional()
+	@IsString()
+	name_ar?: string;
+
+	@IsOptional()
 	@IsInt()
 	sort?: number;
 

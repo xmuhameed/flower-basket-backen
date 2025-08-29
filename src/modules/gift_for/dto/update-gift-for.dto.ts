@@ -6,6 +6,10 @@ export class UpdateGiftForDto {
 	name?: string;
 
 	@IsOptional()
+	@IsString()
+	name_ar?: string;
+
+	@IsOptional()
 	@IsInt()
 	sort?: number;
 

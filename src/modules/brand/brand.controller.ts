@@ -15,6 +15,7 @@ export const createBrand = async (req: Request, res: Response, next: NextFunctio
 		const uniqueBrandCode = await nanoid(10);
 		const brandData: Prisma.brandCreateInput = {
 			name: dto.name,
+			name_ar: dto.name_ar,
 			qrcode: uniqueBrandCode,
 		};
 		const nestedFolder = `brands/brand-${uniqueBrandCode}`;
@@ -41,7 +42,7 @@ export const getAllBrands = async (req: Request, res: Response, next: NextFuncti
 			deleted: false,
 		};
 		if (search.search) {
-			whereObj.OR = [{ name: { contains: search.search } }];
+			whereObj.OR = [{ name: { contains: search.search } }, { name_ar: { contains: search.search } }];
 		}
 		const brands = await prisma.brand.findMany({
 			where: whereObj,
@@ -64,6 +65,7 @@ export const getBrandById = async (req: Request, res: Response, next: NextFuncti
 				id: true,
 				qrcode: true,
 				name: true,
+				name_ar: true,
 				brand_image_url: true,
 				createdAt: true,
 				updatedAt: true,
@@ -78,10 +80,12 @@ export const getBrandById = async (req: Request, res: Response, next: NextFuncti
 						content: true,
 						alert: true,
 						dimensions: true,
-						category: { select: { id: true, name: true } },
-						collection: { select: { id: true, name: true } },
-						gift_for: { select: { id: true, name: true } },
-						brand: { select: { id: true, name: true } },
+						// categor: { select: { id: true, name: true } },
+						// gift_for: { select: { id: true, name: true } },
+						product_category_relation: { select: { id: true, category: { select: { id: true, name: true, name_ar: true } } } },
+						product_gift_for_relation: { select: { id: true, gift_for: { select: { id: true, name: true, name_ar: true } } } },
+						collection: { select: { id: true, name: true, name_ar: true } },
+						brand: { select: { id: true, name: true, name_ar: true } },
 						product_image: true,
 						createdAt: true,
 						updatedAt: true,
@@ -110,6 +114,7 @@ export const updateBrand = async (req: Request, res: Response, next: NextFunctio
 		}
 		const brandData: Prisma.brandUpdateInput = {
 			...(dto.name && { name: dto.name }),
+			...(dto.name_ar && { name_ar: dto.name_ar }),
 		};
 		const nestedFolder = `brands/brand-${brand.qrcode}`;
 		if (req.files?.['brand_image']) {

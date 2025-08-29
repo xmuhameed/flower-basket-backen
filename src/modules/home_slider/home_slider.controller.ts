@@ -15,6 +15,7 @@ export const createHomeSlider = async (req: Request, res: Response, next: NextFu
 		const uniqueSliderCode = await nanoid(10);
 		const sliderData: Prisma.home_sliderCreateInput = {
 			name: dto.name,
+			name_ar: dto.name_ar,
 			sort: dto.sort,
 			qrcode: uniqueSliderCode,
 			button_text: dto.button_text,
@@ -44,7 +45,7 @@ export const getAllHomeSliders = async (req: Request, res: Response, next: NextF
 			deleted: false,
 		};
 		if (search.search) {
-			whereObj.OR = [{ name: { contains: search.search } }];
+			whereObj.OR = [{ name: { contains: search.search } }, { name_ar: { contains: search.search } }];
 		}
 		const sliders = await prisma.home_slider.findMany({
 			where: whereObj,
@@ -67,6 +68,7 @@ export const getHomeSliderById = async (req: Request, res: Response, next: NextF
 				id: true,
 				qrcode: true,
 				name: true,
+				name_ar: true,
 				sort: true,
 				button_text: true,
 				button_url: true,
@@ -96,6 +98,7 @@ export const updateHomeSlider = async (req: Request, res: Response, next: NextFu
 		}
 		const sliderData: Prisma.home_sliderUpdateInput = {
 			...(dto.name && { name: dto.name }),
+			...(dto.name_ar && { name_ar: dto.name_ar }),
 			...(dto.sort && { sort: dto.sort }),
 			...(dto.button_text && { button_text: dto.button_text }),
 			...(dto.button_url && { button_url: dto.button_url }),

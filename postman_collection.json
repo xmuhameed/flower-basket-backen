@@ -931,13 +931,16 @@
 						"url": {
 							"raw": "{{baseUrl}}/favorites",
 							"host": ["{{baseUrl}}"],
-							"path": ["favorites"],
-							"query": [
-								{ "key": "user_id", "value": "", "disabled": true },
-								{ "key": "page", "value": "1", "disabled": true },
-								{ "key": "pageItemsCount", "value": "10", "disabled": true }
-							]
+							"path": ["favorites"]
 						}
+					}
+				},
+				{
+					"name": "Clear Favorites",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/favorites", "host": ["{{baseUrl}}"], "path": ["favorites"] }
 					}
 				},
 				{
@@ -1039,7 +1042,15 @@
 			"name": "Cart",
 			"item": [
 				{
-					"name": "Create Cart",
+					"name": "Get User Cart",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/carts", "host": ["{{baseUrl}}"], "path": ["carts"] }
+					}
+				},
+				{
+					"name": "Add To Cart",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1047,44 +1058,32 @@
 							{ "key": "Content-Type", "value": "application/json", "type": "text" }
 						],
 						"url": { "raw": "{{baseUrl}}/carts", "host": ["{{baseUrl}}"], "path": ["carts"] },
-						"body": { "mode": "raw", "raw": "{\n  \"product_id\": 1,\n  \"quantity\": 2\n}" }
+						"body": { "mode": "raw", "raw": "{\n  \"product_ids\": \"1,2\",\n  \"quantities\": \"1,2\"\n}" }
 					}
 				},
 				{
-					"name": "Get All Carts",
+					"name": "Update Cart Item",
 					"request": {
-						"method": "GET",
+						"method": "PATCH",
 						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
-						"url": {
-							"raw": "{{baseUrl}}/carts",
-							"host": ["{{baseUrl}}"],
-							"path": ["carts"],
-							"query": [
-								{ "key": "product_id", "value": "", "disabled": true },
-								{ "key": "page", "value": "1", "disabled": true },
-								{ "key": "pageItemsCount", "value": "10", "disabled": true }
-							]
-						}
+						"url": { "raw": "{{baseUrl}}/carts/:id", "host": ["{{baseUrl}}"], "path": ["carts", ":id"], "variable": [{ "key": "id", "value": "1", "type": "string" }] },
+						"body": { "mode": "raw", "raw": "{\n  \"quantity\": 2\n}" }
 					}
 				},
 				{
-					"name": "Update Cart",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
-							{ "key": "Content-Type", "value": "application/json", "type": "text" }
-						],
-						"url": { "raw": "{{baseUrl}}/carts/:id", "host": ["{{baseUrl}}"], "path": ["carts", ":id"] },
-						"body": { "mode": "raw", "raw": "{\n  \"quantity\": 3\n}" }
-					}
-				},
-				{
-					"name": "Delete Cart",
+					"name": "Remove From Cart",
 					"request": {
 						"method": "DELETE",
 						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
-						"url": { "raw": "{{baseUrl}}/carts/:id", "host": ["{{baseUrl}}"], "path": ["carts", ":id"] }
+						"url": { "raw": "{{baseUrl}}/carts/:ids", "host": ["{{baseUrl}}"], "path": ["carts", ":ids"], "variable": [{ "key": "ids", "value": "1,2", "type": "string" }] }
+					}
+				},
+				{
+					"name": "Clear Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+						"url": { "raw": "{{baseUrl}}/carts", "host": ["{{baseUrl}}"], "path": ["carts"] }
 					}
 				}
 			]

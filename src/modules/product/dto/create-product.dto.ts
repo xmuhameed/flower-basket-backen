@@ -1,10 +1,13 @@
-import { IsString, IsInt, IsOptional, IsEnum, IsArray } from 'class-validator';
+import { IsString, IsInt, IsOptional, IsEnum, IsArray, IsNumber, IsPositive, IsBoolean } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { currency, Prisma } from '@prisma/client';
 
 export class CreateProductDto {
 	@IsString()
 	name: string;
+
+	@IsString()
+	name_ar: string;
 
 	@Transform(({ value }) => parseInt(value))
 	@IsInt()
@@ -13,10 +16,17 @@ export class CreateProductDto {
 	@IsEnum(currency)
 	currency: currency;
 
-	@Transform(({ value }) => parseInt(value))
 	@IsOptional()
-	@IsInt()
-	category_id?: number;
+	@Transform(({ value }) => (typeof value === 'string' ? value.split(',').map((id: string) => parseInt(id)) : value))
+	@IsNumber({}, { each: true })
+	@IsPositive({ each: true })
+	category_ids?: number[];
+	
+	@IsOptional()
+	@Transform(({ value }) => (typeof value === 'string' ? value.split(',').map((id: string) => parseInt(id)) : value))
+	@IsNumber({}, { each: true })
+	@IsPositive({ each: true })
+	gift_for_ids?: number[];
 
 	@Transform(({ value }) => parseInt(value))
 	@IsOptional()
@@ -26,7 +36,7 @@ export class CreateProductDto {
 	@Transform(({ value }) => parseInt(value))
 	@IsOptional()
 	@IsInt()
-	gift_for_id?: number;
+	collection_index?: number;
 
 	@Transform(({ value }) => parseInt(value))
 	@IsOptional()
@@ -41,4 +51,32 @@ export class CreateProductDto {
 	@IsOptional()
 	@IsArray()
 	product_images?: any[];
+
+	@IsOptional()
+	@IsString()
+	description?: string;
+
+	@IsOptional()
+	@IsString()
+	how_to_care?: string;
+
+	@IsOptional()
+	@IsString()
+	content?: string;
+
+	@IsOptional()
+	@IsString()
+	alert?: string;
+
+	@IsOptional()
+	@IsString()
+	dimensions?: string;
+
+	@IsOptional()
+	@IsBoolean()
+	fast_delivery?: boolean;
+
+	@IsOptional()
+	@IsString()
+	color?: string;
 }

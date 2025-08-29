@@ -1,9 +1,8 @@
 import { Router } from 'express';
 import * as favoriteController from './favorite.controller';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { GetAllFavoritesDto } from './dto/get-all-favorites.dto';
 import { validationMiddleware } from '../../shared/middleware/validation.middleware';
-import { GlobalPaginationDto, IdentifierDto } from '../../shared/global-dto';
+import { IdentifierDto } from '../../shared/global-dto';
 import { protect, restrictTo } from '../auth/auth.middleware';
 import { UserType } from '../auth/dto';
 
@@ -18,11 +17,8 @@ router
 		validationMiddleware({ body: [CreateFavoriteDto] }),
 		favoriteController.createFavorite,
 	)
-	.get(
-		restrictTo(UserType.USER),
-		validationMiddleware({ query: [GetAllFavoritesDto, GlobalPaginationDto] }),
-		favoriteController.getAllFavorites,
-	);
+	.get(restrictTo(UserType.USER), favoriteController.getAllFavorites)
+	.delete(restrictTo(UserType.USER), favoriteController.clearFavorites);
 
 router
 	.route('/:id')
